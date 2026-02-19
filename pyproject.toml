@@ -45,3 +45,8 @@ known-first-party = ["src"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # ignore unused imports in __init__.py files
+
+[tool.uv.workspace]
+members = [
+    "backend",
+]
