@@ -116,3 +116,136 @@ paths:
        token: { type: string, example: "jwt.token.here" }
        user:
          $ref: "#/components/schemas/UserPublic"
+# ---------------------------
+ # USERS
+ # ---------------------------
+ /api/users/{id}:
+   get:
+     tags: [Users]
+     summary: Get a user profile by id
+     parameters:
+       - name: id
+         in: path
+         required: true
+         schema: { type: string }
+     responses:
+       "200":
+         description: User profile
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/UserPublic"
+       "404":
+         description: User not found
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+
+
+   put:
+     tags: [Users]
+     summary: Update user profile (must be the same user)
+     security:
+       - bearerAuth: []
+     parameters:
+       - name: id
+         in: path
+         required: true
+         schema: { type: string }
+     requestBody:
+       required: true
+       content:
+         application/json:
+           schema:
+             $ref: "#/components/schemas/UserUpdate"
+     responses:
+       "200":
+         description: Updated user profile
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/SuccessUserResponse"
+       "401":
+         description: Not authenticated
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "403":
+         description: Forbidden (updating another user)
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "404":
+         description: User not found
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+
+
+   delete:
+     tags: [Users]
+     summary: Delete user account (must be the same user)
+     security:
+       - bearerAuth: []
+     parameters:
+       - name: id
+         in: path
+         required: true
+         schema: { type: string }
+     responses:
+       "200":
+         description: User deleted
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/SuccessResponse"
+       "401":
+         description: Not authenticated
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "403":
+         description: Forbidden (deleting another user)
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+
+
+   # ---------------------------
+   # USER SCHEMAS
+   # ---------------------------
+   UserPublic:
+     type: object
+     properties:
+       id: { type: string, example: "b3d1c3a2-..." }
+       name: { type: string }
+       email: { type: string, format: email }
+       role:
+         $ref: "#/components/schemas/UserRole"
+       bio: { type: string, nullable: true }
+       created_at: { type: string, format: date-time }
+       updated_at: { type: string, format: date-time }
+
+
+   UserUpdate:
+     type: object
+     properties:
+       name: { type: string }
+       email: { type: string, format: email }
+       bio: { type: string }
+
+
+   SuccessUserResponse:
+     type: object
+     properties:
+       success: { type: boolean, example: true }
+       user:
+         $ref: "#/components/schemas/UserPublic"
+
+
