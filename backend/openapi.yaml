@@ -248,7 +248,215 @@ paths:
        user:
          $ref: "#/components/schemas/UserPublic"
 
+# ---------------------------
+# GIGS
+# ---------------------------
+/api/gigs:
+get:
+    tags: [Gigs]
+    summary: Browse/search gigs
+    parameters:
+    - name: search
+        in: query
+        required: false
+        schema: { type: string }
+    - name: category
+        in: query
+        required: false
+        schema: { type: string }
+    - name: minPrice
+        in: query
+        required: false
+        schema: { type: number, format: float, minimum: 0 }
+    - name: maxPrice
+        in: query
+        required: false
+        schema: { type: number, format: float, minimum: 0 }
+    responses:
+    "200":
+        description: List of gigs
+        content:
+        application/json:
+            schema:
+            type: array
+            items:
+                $ref: "#/components/schemas/GigPublic"
 
+post:
+    tags: [Gigs]
+    summary: Create a gig (seller only)
+    security:
+    - bearerAuth: []
+    requestBody:
+    required: true
+    content:
+        application/json:
+        schema:
+            $ref: "#/components/schemas/GigCreate"
+    responses:
+    "201":
+        description: Gig created
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/SuccessGigResponse"
+    "401":
+        description: Not authenticated
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    "403":
+        description: Forbidden (buyer cannot create gigs)
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+/api/gigs/{id}:
+get:
+    tags: [Gigs]
+    summary: Get gig details by id
+    parameters:
+    - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+    "200":
+        description: Gig details
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/GigPublic"
+    "404":
+        description: Gig not found
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+put:
+    tags: [Gigs]
+    summary: Update a gig (seller only, must own gig)
+    security:
+    - bearerAuth: []
+    parameters:
+    - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+    required: true
+    content:
+        application/json:
+        schema:
+            $ref: "#/components/schemas/GigUpdate"
+    responses:
+    "200":
+        description: Gig updated
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/SuccessGigResponse"
+    "401":
+        description: Not authenticated
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    "403":
+        description: Forbidden (not owner or wrong role)
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    "404":
+        description: Gig not found
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+delete:
+    tags: [Gigs]
+    summary: Delete a gig (seller only, must own gig)
+    security:
+    - bearerAuth: []
+    parameters:
+    - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+    "200":
+        description: Gig deleted
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/SuccessResponse"
+    "401":
+        description: Not authenticated
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    "403":
+        description: Forbidden (not owner or wrong role)
+        content:
+        application/json:
+            schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    
+# ---------------------------
+# GIG SCHEMAS
+# ---------------------------
+    GigCreate:
+        type: object
+        required: [title, description, price, category]
+        properties:
+            title: { type: string, minLength: 1 }
+            description: { type: string, minLength: 1 }
+            price: { type: number, format: float, minimum: 0 }
+            category: { type: string, minLength: 1 }
+            tags:
+            type: array
+            items: { type: string }
+    
+        GigUpdate:
+        type: object
+        properties:
+            title: { type: string }
+            description: { type: string }
+            price: { type: number, format: float, minimum: 0 }
+            category: { type: string }
+            tags:
+            type: array
+            items: { type: string }
+            is_active: { type: boolean }
+    
+        GigPublic:
+        type: object
+        properties:
+            id: { type: string }
+            seller_id: { type: string }
+            title: { type: string }
+            description: { type: string }
+            price: { type: number, format: float }
+            category: { type: string }
+            tags:
+            type: array
+            items: { type: string }
+            is_active: { type: boolean }
+            created_at: { type: string, format: date-time }
+            updated_at: { type: string, format: date-time }
+    
+        SuccessGigResponse:
+        type: object
+        properties:
+            success: { type: boolean, example: true }
+            gig:
+            $ref: "#/components/schemas/GigPublic"
  # ---------------------------
  # ORDERS
  # ---------------------------
