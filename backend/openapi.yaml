@@ -116,3 +116,166 @@ paths:
        token: { type: string, example: "jwt.token.here" }
        user:
          $ref: "#/components/schemas/UserPublic"
+         
+# ---------------------------
+ # REVIEWS
+ # ---------------------------
+ /api/reviews:
+   post:
+     tags: [Reviews]
+     summary: Create a review (buyer only; typically after a completed order)
+     security:
+       - bearerAuth: []
+     requestBody:
+       required: true
+       content:
+         application/json:
+           schema:
+             $ref: "#/components/schemas/ReviewCreate"
+     responses:
+       "201":
+         description: Review created
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/SuccessReviewResponse"
+       "401":
+         description: Not authenticated
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "403":
+         description: Forbidden (seller cannot create reviews)
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "404":
+         description: Gig not found
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+
+
+ /api/gigs/{id}/reviews:
+   get:
+     tags: [Reviews]
+     summary: Get all reviews for a gig
+     parameters:
+       - name: id
+         in: path
+         required: true
+         schema: { type: string }
+     responses:
+       "200":
+         description: List of reviews for the gig
+         content:
+           application/json:
+             schema:
+               type: array
+               items:
+                 $ref: "#/components/schemas/ReviewPublic"
+
+
+ /api/reviews/{id}:
+   delete:
+     tags: [Reviews]
+     summary: Delete a review (owner/admin)
+     security:
+       - bearerAuth: []
+     parameters:
+       - name: id
+         in: path
+         required: true
+         schema: { type: string }
+     responses:
+       "200":
+         description: Review deleted
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/SuccessResponse"
+       "401":
+         description: Not authenticated
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "403":
+         description: Forbidden (not review owner)
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+       "404":
+         description: Review not found
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/ErrorResponse"
+
+
+components:
+ securitySchemes:
+   bearerAuth:
+     type: http
+     scheme: bearer
+     bearerFormat: JWT
+# ---------------------------
+   # REVIEW SCHEMAS
+   # ---------------------------
+   ReviewCreate:
+     type: object
+     required: [gigId, rating]
+     properties:
+       gigId: { type: string }
+       rating: { type: integer, minimum: 1, maximum: 5 }
+       comment: { type: string }
+
+
+   ReviewPublic:
+     type: object
+     properties:
+       id: { type: string }
+       gig_id: { type: string }
+       buyer_id: { type: string }
+       rating: { type: integer, minimum: 1, maximum: 5 }
+       comment: { type: string, nullable: true }
+       created_at: { type: string, format: date-time }
+
+
+   SuccessReviewResponse:
+     type: object
+     properties:
+       success: { type: boolean, example: true }
+       review:
+         $ref: "#/components/schemas/ReviewPublic"
+
+
+   # ---------------------------
+   # GENERIC RESPONSES
+   # ---------------------------
+   SuccessResponse:
+     type: object
+     properties:
+       success: { type: boolean, example: true }
+       message: { type: string, example: "OK" }
+
+
+   ErrorResponse:
+     type: object
+     properties:
+       success: { type: boolean, example: false }
+       error:
+         type: object
+         properties:
+           code: { type: string, example: "VALIDATION_ERROR" }
+           message: { type: string, example: "Something went wrong" }
+           details:
+             type: object
+             additionalProperties: true
+
+
+
