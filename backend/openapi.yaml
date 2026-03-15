@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SkillBridge Marketplace API
+  title: GigLink Marketplace API
   version: 1.0.0
   description: >
     A scoped-down Fiverr-like marketplace without payments.
