@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class OrderBase(BaseModel):
-    gig_id: int
+    gig_id: str
     message: str
 
 class OrderCreate(OrderBase):
@@ -14,9 +14,9 @@ class OrderUpdate(BaseModel):
     status: Literal["pending", "accepted", "rejected", "completed"]
 
 class OrderPublic(BaseModel):
-    id: int
-    gig_id: int
-    buyer_id: int
+    id: str
+    gig_id: str
+    buyer_id: str
     message: str
     status: Literal["pending", "accepted", "rejected", "completed"]
     created_at: datetime

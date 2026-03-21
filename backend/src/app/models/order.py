@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from core.database import Base
@@ -7,9 +7,9 @@ from core.database import Base
 class Order(Base):
     __tablename__ = "orders"
 
-    id = Column(Integer, primary_key=True, index=True)
-    gig_id = Column(Integer, ForeignKey("gigs.id"), nullable=False)
-    buyer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id = Column(String, primary_key=True, index=True)
+    gig_id = Column(String, ForeignKey("gigs.id"), nullable=False)
+    buyer_id = Column(String, ForeignKey("users.id"), nullable=False)
 
     message = Column(Text, nullable=False)
 
