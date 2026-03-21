@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.models.gig import Gig
-from app.models.order import Order
-from app.models.user import User
-from app.repository import review as review_repo
+from src.app.models.gig import Gig
+from src.app.models.order import Order
+from src.app.models.user import User
+from src.app.repository import review as review_repo
 
 
 def create_review_service(db: Session, current_user: User, gig_id: str, rating: int, comment: str | None):

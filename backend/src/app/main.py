@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1.routes import api_router
+from src.app.api.v1.routes import api_router
 
 app = FastAPI(title="GigLink Marketplace")
 
