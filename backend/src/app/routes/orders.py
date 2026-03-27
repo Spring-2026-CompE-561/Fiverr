@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.core.auth import get_current_user
-from core.database import get_db
-from schemas.order import OrderCreate, OrderUpdate, OrderResponse
-from services.order import (
+from src.app.core.auth import get_current_user
+from src.app.core.database import get_db
+from src.app.schemas.order import OrderCreate, OrderUpdate, OrderPublic
+from src.app.services.order import (
     create_order_service,
     list_orders_service,
     get_order_service,
@@ -13,7 +13,7 @@ from services.order import (
 
 router = APIRouter(prefix="/api/orders", tags=["Orders"])
 
-@router.post("", response_model=OrderResponse)
+@router.post("", response_model=OrderPublic)
 def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return create_order_service(db, current_user, order)
@@ -21,7 +21,7 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("", response_model=list[OrderResponse])
+@router.get("", response_model=list[OrderPublic])
 def list_orders(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return list_orders_service(db, current_user)
@@ -29,7 +29,7 @@ def list_orders(db: Session = Depends(get_db), current_user=Depends(get_current_
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/{id}", response_model=OrderResponse)
+@router.get("/{id}", response_model=OrderPublic)
 def get_order(id: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return get_order_service(db, id, current_user)
@@ -37,7 +37,7 @@ def get_order(id: str, db: Session = Depends(get_db), current_user=Depends(get_c
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.put("/{id}", response_model=OrderResponse)
+@router.put("/{id}", response_model=OrderPublic)
 def update_order(id: str, order_update: OrderUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return update_order_service(db, id, order_update.status, current_user)

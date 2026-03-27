@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.schemas.user import UserRegister, UserUpdate
+from src.app.models.user import User
+from src.app.schemas.user import UserRegister, UserUpdate
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:

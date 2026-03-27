@@ -5,12 +5,12 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
-from app.core.database import get_db
-from app.core.dependencies import require_same_user
-from app.models.user import User
-from app.repository.user import delete_user, get_user_by_email, get_user_by_id, update_user
-from app.schemas.user import MessageResponse, UserPublic, UserUpdate, UserUpdateResponse
+from src.app.core.auth import get_current_user
+from src.app.core.database import get_db
+from src.app.core.dependencies import require_same_user
+from src.app.models.user import User
+from src.app.repository.user import delete_user, get_user_by_email, get_user_by_id, update_user
+from src.app.schemas.user import MessageResponse, UserPublic, UserUpdate, UserUpdateResponse
 
 router = APIRouter()
 

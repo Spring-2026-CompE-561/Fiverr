@@ -3,16 +3,16 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.core.dependencies import get_current_user
-from app.models.user import User
-from app.schemas.review import (
+from src.app.core.auth import get_current_user
+from src.app.core.database import get_db
+from src.app.models.user import User
+from src.app.schemas.review import (
     ReviewCreate,
     ReviewPublic,
     SuccessReviewResponse,
     SuccessResponse,
 )
-from app.services.review import (
+from src.app.services.review import (
     create_review_service,
     list_gig_reviews_service,
     delete_review_service,
