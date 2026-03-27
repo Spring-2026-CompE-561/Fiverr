@@ -15,3 +15,5 @@ api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(users_router, prefix="/users", tags=["users"])
 api_router.include_router(gigs_router, tags=["Gigs"])
 api_router.include_router(reviews_router, tags=["Reviews"])
+
+router = api_router
