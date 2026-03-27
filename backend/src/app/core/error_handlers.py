@@ -6,7 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 # handles 404, 401, 403, etc.
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     return JSONResponse(
-        status_code=exc.status_code
+        status_code=exc.status_code,
         content={"error": exc.detail}
     )
 
