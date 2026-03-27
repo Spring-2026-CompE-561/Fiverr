@@ -1,9 +1,51 @@
 [project]
-name = "backend"
+name = "giglink-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "GigLink Marketplace backend (FastAPI)"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
+
 dependencies = [
-    "fastapi[standard]>=0.129.0",
+  "fastapi[all]>=0.78.0",
+  "sqlalchemy>=1.4",
+  "pydantic-settings>=1.0",
+  "python-dotenv>=1.0",
+  "passlib[bcrypt]>=1.7",
+  "python-jose[cryptography]>=3.3",
+  "requests>=2.32.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "httpx>=0.24",          # testing client
+  "ruff>=0.15.0",
+  "black>=24.0",
+  "isort>=5.12",
+]
+
+dev = [
+  "pytest>=7.0",
+  "ruff>=0.15.0",
+  "black>=24.0",
+  "isort>=5.12",
+]
+
+[tool.ruff]
+line-length = 88
+lint.select = ["ALL"]
+fix = true
+
+[tool.ruff.lint]
+ignore = [
+  "E501",
+  "D107",
+  "D104",
+  "D",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
