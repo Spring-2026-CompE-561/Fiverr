@@ -24,24 +24,18 @@ dev = [
   "isort>=5.12",
 ]
 
-dev = [
-  "pytest>=7.0",
-  "ruff>=0.15.0",
-  "black>=24.0",
-  "isort>=5.12",
-]
 
 [tool.ruff]
 line-length = 88
-lint.select = ["ALL"]
 fix = true
 
 [tool.ruff.lint]
+select = ["ALL"]
 ignore = [
-  "E501",
-  "D107",
-  "D104",
-  "D",
+    "E501",
+    "D107",
+    "D104",
+    "D",
 ]
 
 [tool.ruff.lint.isort]

@@ -24,3 +24,5 @@ class Gig(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     seller = relationship("User", back_populates="gigs")
+    orders = relationship("Order", back_populates="gig")
+    reviews = relationship("Review", back_populates="gig")

@@ -24,6 +24,7 @@ class Order(Base):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
+    
 
     # Relationships
     gig = relationship("Gig", back_populates="orders")
