@@ -7,10 +7,15 @@ engine = create_engine(                        # engine connects python to datab
     settings.DATABASE_URL,
     connect_args={"check_same_thread": False}  # only needed for SQLite
 )
+
+
 # creates sessions to run queries
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)  # SessionLocal creates sessions to do queries
+
 # base class that all model wil inherit from
 Base = declarative_base() 
+
+
 # opens and closes the DB connection automatically                     
 def get_db():
     db = SessionLocal()

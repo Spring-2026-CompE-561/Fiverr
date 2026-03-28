@@ -3,8 +3,8 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from src.app.models.gig import Gig
-from src.app.schemas.gig import GigCreate, GigUpdate
+from app.models.gig import Gig
+from app.schemas.gig import GigCreate, GigUpdate
 
 
 def get_all_gigs(

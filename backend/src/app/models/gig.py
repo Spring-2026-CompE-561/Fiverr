@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from src.app.core.database import Base
+from app.core.database import Base
 
 
 class Gig(Base):

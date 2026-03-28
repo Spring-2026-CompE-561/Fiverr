@@ -3,11 +3,11 @@ from __future__ import annotations
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.app.core.dependencies import require_buyer, require_seller
-from src.app.models.gig import Gig
-from src.app.models.order import Order
-from src.app.models.user import User, UserRole
-from src.app.repository.order import (
+from app.core.dependencies import require_buyer, require_seller
+from app.models.gig import Gig
+from app.models.order import Order
+from app.models.user import User, UserRole
+from app.repository.order import (
     create_order,
     delete_order,
     get_order_by_id,
@@ -15,7 +15,8 @@ from src.app.repository.order import (
     get_orders_by_seller,
     update_order_status,
 )
-from src.app.schemas.order import OrderCreate
+
+from app.schemas.order import OrderCreate
 
 
 def create_order_service(

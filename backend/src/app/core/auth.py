@@ -10,10 +10,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from src.app.core.database import get_db
-from src.app.core.settings import settings
-from src.app.models.user import User
-from src.app.repository.user import get_user_by_id
+from app.core.database import get_db
+from app.core.settings import settings
+from app.models.user import User
+from app.repository.user import get_user_by_id
 
 # Password hashing context.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
