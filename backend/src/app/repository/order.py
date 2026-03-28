@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from src.app.models.order import Order
-from src.app.models.gig import Gig
+from app.models.order import Order
+from app.models.gig import Gig
 
 
 def create_order(db: Session, gig_id: str, buyer_id: str, message: str) -> Order:

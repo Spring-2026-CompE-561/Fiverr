@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from src.app.models.review import Review
+from app.models.review import Review
 
 
 def create_review(

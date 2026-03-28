@@ -5,10 +5,10 @@ from __future__ import annotations
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.app.core.dependencies import require_seller
-from src.app.models.user import User
-from src.app.repository import gig as gig_repo
-from src.app.schemas.gig import GigCreate, GigUpdate
+from app.core.dependencies import require_seller
+from app.models.user import User
+from app.repository import gig as gig_repo
+from app.schemas.gig import GigCreate, GigUpdate
 
 
 def list_gigs_service(

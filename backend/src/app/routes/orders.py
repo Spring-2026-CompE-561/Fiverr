@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from src.app.core.auth import get_current_user
-from src.app.core.database import get_db
-from src.app.schemas.order import OrderCreate, OrderUpdate, OrderPublic
-from src.app.services.order import (
+
+from app.core.auth import get_current_user
+from app.core.database import get_db
+from app.schemas.order import OrderCreate, OrderUpdate, OrderPublic
+from app.services.order import (
     create_order_service,
     list_orders_service,
     get_order_service,
@@ -11,9 +12,10 @@ from src.app.services.order import (
     cancel_order_service,
 )
 
-router = APIRouter(prefix="/api/orders", tags=["Orders"])
+router = APIRouter(prefix="/orders", tags=["Orders"])
 
-@router.post("", response_model=OrderPublic)
+
+@router.post("", response_model=OrderPublic, summary="Create an order")
 def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return create_order_service(db, current_user, order)
@@ -21,7 +23,7 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("", response_model=list[OrderPublic])
+@router.get("", response_model=list[OrderPublic], summary="List orders")
 def list_orders(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return list_orders_service(db, current_user)
@@ -29,7 +31,7 @@ def list_orders(db: Session = Depends(get_db), current_user=Depends(get_current_
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/{id}", response_model=OrderPublic)
+@router.get("/{id}", response_model=OrderPublic, summary="Get order by ID")
 def get_order(id: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return get_order_service(db, id, current_user)
@@ -37,7 +39,7 @@ def get_order(id: str, db: Session = Depends(get_db), current_user=Depends(get_c
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.put("/{id}", response_model=OrderPublic)
+@router.put("/{id}", response_model=OrderPublic, summary="Update an order")
 def update_order(id: str, order_update: OrderUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return update_order_service(db, id, order_update.status, current_user)
@@ -45,7 +47,7 @@ def update_order(id: str, order_update: OrderUpdate, db: Session = Depends(get_d
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", summary="Delete or cancel an order")
 def delete_order(id: str, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     try:
         return cancel_order_service(db, id, current_user)

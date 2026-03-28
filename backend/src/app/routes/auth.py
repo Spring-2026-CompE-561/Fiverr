@@ -5,15 +5,15 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.app.core.auth import create_access_token, hash_password, verify_password
-from src.app.core.database import get_db
-from src.app.repository.user import create_user, get_user_by_email
-from src.app.schemas.user import AuthResponse, UserLogin, UserRegister
+from app.core.auth import create_access_token, hash_password, verify_password
+from app.core.database import get_db
+from app.repository.user import create_user, get_user_by_email
+from app.schemas.user import AuthResponse, UserLogin, UserRegister
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED, summary="Register a new user")
 def register(user_data: UserRegister, db: Session = Depends(get_db)) -> AuthResponse:
     """Register a new buyer or seller and return a JWT."""
     existing_user = get_user_by_email(db, user_data.email)
@@ -34,7 +34,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)) -> AuthResp
     )
 
 
-@router.post("/login", response_model=AuthResponse, status_code=status.HTTP_200_OK)
+@router.post("/login", response_model=AuthResponse, status_code=status.HTTP_200_OK, summary="Log in a user")
 def login(user_data: UserLogin, db: Session = Depends(get_db)) -> AuthResponse:
     """Authenticate a user and return a JWT."""
     db_user = get_user_by_email(db, user_data.email)

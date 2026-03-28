@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import HTTPException, status
 
-from src.app.models.user import User, UserRole
+from app.models.user import User, UserRole
 
 
 def require_same_user(path_user_id: str, current_user: User) -> None:

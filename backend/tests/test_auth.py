@@ -1,12 +1,15 @@
+import uuid
+
 def test_register(client):
+    email = f"newuser_{uuid.uuid4().hex}@test.com"
     response = client.post("/api/v1/auth/register", json={
-        "email": "newuser@test.com",
+        "name": "New User",
+        "email": email,
         "password": "test1234",
-        "username": "newuser",
         "role": "buyer"
     })
     assert response.status_code == 201
-    assert response.json()["success"] == True
+    assert response.json()["success"] is True
 
 def test_login(client):
     response = client.post("/api/v1/auth/login", json={

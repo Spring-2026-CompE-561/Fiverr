@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-from src.app.main import app
+from app.main import app
+import uuid
 
 client = TestClient(app)
 
@@ -17,18 +18,32 @@ def test_health_check():
 
 # test user registration
 def test_register_user():
+    email = f"test_{uuid.uuid4().hex}@test.com"
     response = client.post("/api/v1/auth/register", json={
         "name": "Test User",
-        "email": "test@test.com",
-        "password": "testpassword"
+        "email": email,
+        "password": "test1234",
+        "role": "buyer"
     })
     assert response.status_code in [200, 201]
-
 # test user login
 def test_login_user():
+    email = f"test_{uuid.uuid4().hex}@test.com"
+    password = "testpassword"
+    
+    # Register the user first
+    register_response = client.post("/api/v1/auth/register", json={
+        "name": "Test User",
+        "email": email,
+        "password": password,
+        "role": "buyer"
+    })
+    assert register_response.status_code in [200, 201]
+    
+    # Now login with the registered user
     response = client.post("/api/v1/auth/login", json={
-        "email": "test@test.com",
-        "password": "testpassword"
+        "email": email,
+        "password": password
     })
     assert response.status_code in [200, 201]
 
