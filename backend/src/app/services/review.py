@@ -4,10 +4,23 @@ from sqlalchemy.orm import Session
 from app.models.gig import Gig
 from app.models.order import Order
 from app.models.user import User
-from app.repository import review as review_repo
+import app.repository.review as review_repo
 
 
-def create_review_service(db: Session, current_user: User, gig_id: str, rating: int, comment: str | None):
+def _get_order_status_column():
+    order_status_col = getattr(Order, "order_status", None)
+    if order_status_col is None:
+        order_status_col = getattr(Order, "status", None)
+    return order_status_col
+
+
+def create_review_service(
+    db: Session,
+    current_user: User,
+    gig_id: str,
+    rating: int,
+    comment: str | None,
+):
     if current_user.role != "buyer":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -28,12 +41,19 @@ def create_review_service(db: Session, current_user: User, gig_id: str, rating: 
             detail="You have already reviewed this gig",
         )
 
+    order_status_col = _get_order_status_column()
+    if order_status_col is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Order model is missing a status field",
+        )
+
     completed_order = (
         db.query(Order)
         .filter(
             Order.gig_id == gig_id,
             Order.buyer_id == current_user.id,
-            Order.status == "completed",
+            order_status_col == "completed",
         )
         .first()
     )
