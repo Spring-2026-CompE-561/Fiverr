@@ -37,9 +37,10 @@ export default function SignupPage() {
       });
       const data = await loginUser(form.email, form.password);
       saveToken(data.access_token);
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+      router.replace("/");
+      router.refresh();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} method="post" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
             <input

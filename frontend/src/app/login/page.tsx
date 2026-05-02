@@ -18,9 +18,10 @@ export default function LoginPage() {
     try {
       const data = await loginUser(email, password);
       saveToken(data.access_token);
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+      router.replace("/");
+      router.refresh();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} method="post" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input

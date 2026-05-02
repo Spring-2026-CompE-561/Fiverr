@@ -1,6 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { validateSession } from "@/lib/auth";
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const syncAuthState = async () => {
+      const user = await validateSession();
+      setIsLoggedIn(Boolean(user));
+    };
+    void syncAuthState();
+  }, []);
+
   return (
     <main className="flex min-h-full flex-col gap-12">
       <section className="flex flex-col gap-6 py-10">
@@ -25,7 +39,7 @@ export default function Home() {
             Browse Gigs
           </Link>
           <Link
-            href="/post"
+            href={isLoggedIn ? "/post" : "/login"}
             className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-6 text-sm font-medium text-card-foreground transition hover:bg-accent hover:text-accent-foreground"
           >
             Post a Gig
@@ -76,7 +90,7 @@ export default function Home() {
           </div>
 
           <Link
-            href="/dashboard"
+            href={isLoggedIn ? "/dashboard" : "/login"}
             className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:opacity-90"
           >
             Go to Dashboard
