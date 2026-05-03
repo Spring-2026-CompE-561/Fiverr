@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { loginUser, saveToken } from "@/lib/auth";
+import { loginUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,8 +16,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const data = await loginUser(email, password);
-      saveToken(data.access_token);
+      await loginUser(email, password);
       router.replace("/");
       router.refresh();
     } catch (err: unknown) {

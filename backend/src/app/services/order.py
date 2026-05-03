@@ -34,12 +34,19 @@ def create_order_service(
             detail="Gig not found",
         )
 
-    return create_order(
+    order = create_order(
         db=db,
         gig_id=order_data.gig_id,
         buyer_id=current_user.id,
         message=order_data.message,
     )
+    reloaded = get_order_by_id(db, order.id)
+    if not reloaded:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Order created but could not be loaded",
+        )
+    return reloaded
 
 
 def list_orders_service(

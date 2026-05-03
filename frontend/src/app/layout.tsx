@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { AppToaster } from "@/components/app-toaster";
 import { Navbar } from "@/components/navbar";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -43,6 +44,7 @@ export default function RootLayout({
         <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-8">
           {children}
         </main>
+        <AppToaster />
       </body>
     </html>
   );

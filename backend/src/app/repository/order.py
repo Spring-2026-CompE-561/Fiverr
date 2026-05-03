@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Session
-from app.models.order import Order
+from sqlalchemy.orm import Session, joinedload
+
 from app.models.gig import Gig
+from app.models.order import Order
 
 
 def create_order(db: Session, gig_id: str, buyer_id: str, message: str) -> Order:
@@ -17,7 +18,12 @@ def create_order(db: Session, gig_id: str, buyer_id: str, message: str) -> Order
 
 
 def get_order_by_id(db: Session, order_id: str) -> Order | None:
-    return db.query(Order).filter(Order.id == order_id).first()
+    return (
+        db.query(Order)
+        .options(joinedload(Order.buyer), joinedload(Order.gig))
+        .filter(Order.id == order_id)
+        .first()
+    )
 
 
 def get_orders_by_buyer(
@@ -25,7 +31,11 @@ def get_orders_by_buyer(
     buyer_id: str,
     status_filter: str | None = None,
 ) -> list[Order]:
-    query = db.query(Order).filter(Order.buyer_id == buyer_id)
+    query = (
+        db.query(Order)
+        .options(joinedload(Order.buyer), joinedload(Order.gig))
+        .filter(Order.buyer_id == buyer_id)
+    )
     if status_filter:
         query = query.filter(Order.status == status_filter)
     return query.all()
@@ -36,7 +46,12 @@ def get_orders_by_seller(
     seller_id: str,
     status_filter: str | None = None,
 ) -> list[Order]:
-    query = db.query(Order).join(Gig).filter(Gig.seller_id == seller_id)
+    query = (
+        db.query(Order)
+        .options(joinedload(Order.buyer), joinedload(Order.gig))
+        .join(Gig)
+        .filter(Gig.seller_id == seller_id)
+    )
     if status_filter:
         query = query.filter(Order.status == status_filter)
     return query.all()
