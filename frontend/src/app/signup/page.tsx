@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { registerUser, loginUser, saveToken } from "@/lib/auth";
+import { registerUser } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -30,13 +30,11 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await registerUser({
-        username: form.username,
+        name: form.username,
         email: form.email,
         password: form.password,
         role: form.role,
       });
-      const data = await loginUser(form.email, form.password);
-      saveToken(data.access_token);
       router.replace("/");
       router.refresh();
     } catch (err: unknown) {
