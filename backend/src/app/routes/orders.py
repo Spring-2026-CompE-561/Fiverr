@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
+from app.core.dependencies import require_verified_email
 from app.core.database import get_db
 from app.schemas.order import OrderCreate, OrderUpdate, OrderPublic
 from app.services.order import (
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
 @router.post("", response_model=OrderPublic, summary="Create an order")
-def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user=Depends(require_verified_email)):
     try:
         return create_order_service(db, current_user, order)
     except Exception as e:

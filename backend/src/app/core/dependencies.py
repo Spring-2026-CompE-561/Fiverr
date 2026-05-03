@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 
+from app.core.auth import get_current_user
+from app.core.settings import settings
 from app.models.user import User, UserRole
 
 
@@ -32,3 +34,13 @@ def require_seller(current_user: User) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Seller role required",
         )
+
+
+def require_verified_email(current_user: User = Depends(get_current_user)) -> User:
+    """Block marketplace writes until email is verified when SMTP verification is enabled."""
+    if settings.email_verification_enabled and not current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verify your email before posting gigs or placing orders.",
+        )
+    return current_user
