@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { getApiBase } from "@/lib/api";
 import Link from "next/link";
 
 export default function VerifyEmailPage() {
@@ -19,8 +20,7 @@ export default function VerifyEmailPage() {
 
     async function verify() {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/auth/verify-email`,
+        const res = await fetch(`${getApiBase()}/api/v1/auth/verify-email`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

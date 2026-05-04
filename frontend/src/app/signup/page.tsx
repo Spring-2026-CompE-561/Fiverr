@@ -35,8 +35,6 @@ export default function SignupPage() {
         password: form.password,
         role: form.role,
       });
-      const data = await loginUser(form.email, form.password);
-      saveToken(data.access_token);
       router.push("/");
     } catch (err: any) {
       setError(err.message);
