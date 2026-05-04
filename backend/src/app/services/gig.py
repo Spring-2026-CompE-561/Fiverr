@@ -17,6 +17,8 @@ def list_gigs_service(
     category: str | None = None,
     min_price: float | None = None,
     max_price: float | None = None,
+    seller_id: str | None = None,
+    sort: str | None = None,
 ):
     return gig_repo.get_all_gigs(
         db,
@@ -24,6 +26,8 @@ def list_gigs_service(
         category=category,
         min_price=min_price,
         max_price=max_price,
+        seller_id=seller_id,
+        sort=sort,
     )
 
 
