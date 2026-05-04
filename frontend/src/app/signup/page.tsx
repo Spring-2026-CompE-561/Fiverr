@@ -2,12 +2,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { registerUser } from "@/lib/auth";
+import { registerUser, loginUser, saveToken } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -30,15 +30,16 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await registerUser({
-        name: form.username,
+        name: form.name,
         email: form.email,
         password: form.password,
         role: form.role,
       });
-      router.replace("/");
-      router.refresh();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Signup failed");
+      const data = await loginUser(form.email, form.password);
+      saveToken(data.access_token);
+      router.push("/");
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -55,16 +56,16 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} method="post" className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
             <input
-              name="username"
+              name="name"
               required
-              value={form.username}
+              value={form.name}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="johndoe"
+              placeholder="John Doe"
             />
           </div>
 
