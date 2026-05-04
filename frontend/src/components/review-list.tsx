@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { apiFetch } from "@/lib/api";
+import { formatRelativeTime } from "@/lib/format";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Review = {
   id: string;
@@ -66,38 +69,48 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
     <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <h2 className="text-xl font-semibold">Gig Reviews</h2>
 
-      {loading ? <p className="mt-4 text-sm">Loading reviews...</p> : null}
+      {loading ? (
+        <div className="mt-4 space-y-3">
+          <Skeleton className="h-16 w-full rounded-lg" />
+          <Skeleton className="h-16 w-full rounded-lg" />
+        </div>
+      ) : null}
 
       {!loading && error ? (
-        <p className="mt-4 text-sm text-red-600">{error}</p>
+        <p className="mt-4 text-sm text-destructive">{error}</p>
       ) : null}
 
       {!loading && !error && reviews.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">No reviews yet.</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          No reviews yet — be the first to share feedback.
+        </p>
       ) : null}
 
       <div className="mt-4 space-y-4">
-        {reviews.map((review) => (
-          <div
-            key={review.id}
-            className="rounded-lg border border-border bg-background p-4"
-          >
-            <div className="flex items-center justify-between gap-4">
-              <p className="font-semibold">Rating: {review.rating}/5</p>
-              <p className="text-xs text-muted-foreground">
-                {review.created_at || review.createdAt || "No date"}
+        {reviews.map((review) => {
+          const created = review.created_at || review.createdAt;
+          return (
+            <div
+              key={review.id}
+              className="rounded-lg border border-border bg-background p-4"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <p className="font-semibold">Rating: {review.rating}/5</p>
+                <p className="text-xs text-muted-foreground">
+                  {formatRelativeTime(created) || "No date"}
+                </p>
+              </div>
+
+              <p className="mt-2 text-sm text-muted-foreground">
+                Buyer: {review.buyer_id || review.buyerId || "Unknown"}
               </p>
+
+              {review.comment ? (
+                <p className="mt-3 text-sm">{review.comment}</p>
+              ) : null}
             </div>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Buyer: {review.buyer_id || review.buyerId || "Unknown"}
-            </p>
-
-            {review.comment ? (
-              <p className="mt-3 text-sm">{review.comment}</p>
-            ) : null}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

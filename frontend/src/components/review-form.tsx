@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+
 import { apiFetch } from "@/lib/api";
 
 type ReviewFormProps =
@@ -11,36 +13,31 @@ export default function ReviewForm({ type, targetId }: ReviewFormProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
-    setError("");
 
     try {
-      const payload =
-        type === "gig"
-          ? { gig_id: targetId, rating, comment }
-          : { seller_id: targetId, rating, comment };
+      if (type !== "gig") {
+        toast.error("Profile reviews are not enabled in this build.");
+        return;
+      }
 
-      const path =
-        type === "gig"
-          ? "/reviews"
-          : "/profile-reviews";
-
-      await apiFetch(path, {
+      await apiFetch("/api/v1/reviews", {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          gigId: targetId,
+          rating,
+          comment: comment.trim() || undefined,
+        }),
       });
 
-      setMessage("Review submitted successfully.");
+      toast.success("Review posted");
       setComment("");
       setRating(5);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit review");
+      toast.error(err instanceof Error ? err.message : "Failed to submit review");
     } finally {
       setLoading(false);
     }
@@ -89,14 +86,6 @@ export default function ReviewForm({ type, targetId }: ReviewFormProps) {
         >
           {loading ? "Submitting..." : "Submit Review"}
         </button>
-
-        {message ? (
-          <p className="text-sm text-green-500">{message}</p>
-        ) : null}
-
-        {error ? (
-          <p className="text-sm text-red-500">{error}</p>
-        ) : null}
       </div>
     </form>
   );
