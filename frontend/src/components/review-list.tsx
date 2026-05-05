@@ -97,7 +97,7 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
               <div className="flex items-center justify-between gap-4">
                 <p className="font-semibold">Rating: {review.rating}/5</p>
                 <p className="text-xs text-muted-foreground">
-                  {formatRelativeTime(created) || "No date"}
+                  {created ? formatRelativeTime(created) : "No date"}
                 </p>
               </div>
 

@@ -3,6 +3,8 @@
  * Run with: npm run test:integration
  */
 
+import { describe, expect, it } from "vitest";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 describe("Backend health integration", () => {

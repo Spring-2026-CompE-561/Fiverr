@@ -90,18 +90,28 @@ export default function PostGigPage() {
         const err = await res.json().catch(() => ({}));
         console.log("Gig error full:", JSON.stringify(err, null, 2));
 
+        const details = Array.isArray(err.details)
+          ? err.details
+              .map((d: { loc?: string[]; msg?: string }) => {
+                const path = d.loc?.join(".");
+                return path ? `${path}: ${d.msg}` : d.msg;
+              })
+              .filter(Boolean)
+              .join("; ")
+          : "";
+
         const message =
           err.detail ||
           err.error ||
-          err.details?.map((d: any) => `${d.loc?.join(".")}: ${d.msg}`).join("; ") ||
+          details ||
           "Failed to create gig";
 
         throw new Error(message);
       }
 
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to create gig");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create gig");
     } finally {
       setLoading(false);
     }

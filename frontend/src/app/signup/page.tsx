@@ -2,11 +2,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { registerUser, loginUser, saveToken } from "@/lib/auth";
+import { registerUser, type UserPublic } from "@/lib/auth";
+
+type SignupForm = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: UserPublic["role"];
+};
 
 export default function SignupPage() {
   const router = useRouter();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SignupForm>({
     name: "",
     email: "",
     password: "",
@@ -36,8 +44,8 @@ export default function SignupPage() {
         role: form.role,
       });
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Could not create account");
     } finally {
       setLoading(false);
     }

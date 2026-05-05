@@ -27,11 +27,7 @@ export default function GigDetailPage() {
   const [error, setError] = useState("");
   const [orderMsg, setOrderMsg] = useState("");
   const [orderLoading, setOrderLoading] = useState(false);
-  const [viewer, setViewer] = useState<UserPublic | null>(null);
-
-  useEffect(() => {
-    setViewer(getStoredUser());
-  }, []);
+  const [viewer] = useState<UserPublic | null>(() => getStoredUser());
 
   useEffect(() => {
     if (!id) return;

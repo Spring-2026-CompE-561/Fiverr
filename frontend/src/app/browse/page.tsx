@@ -17,6 +17,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 const SORT_KEY = "giglink_browse_sort";
+const SORT_OPTIONS = ["newest", "price_asc", "price_desc"] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
+function getInitialSort(): SortOption {
+  if (typeof window === "undefined") return "newest";
+  const stored = sessionStorage.getItem(SORT_KEY);
+  return SORT_OPTIONS.includes(stored as SortOption)
+    ? (stored as SortOption)
+    : "newest";
+}
 
 function BrowseSkeletonGrid() {
   return (
@@ -50,26 +60,10 @@ function BrowseContent() {
   const [category, setCategory] = useState(initialCategory);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [sort, setSort] = useState("newest");
+  const [sort, setSort] = useState<SortOption>(() => getInitialSort());
   const [gigs, setGigs] = useState<GigPublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem(SORT_KEY);
-    if (
-      stored === "newest" ||
-      stored === "price_asc" ||
-      stored === "price_desc"
-    ) {
-      setSort(stored);
-    }
-  }, []);
-
-  useEffect(() => {
-    setSearchInput(initialSearch);
-    setCategory(initialCategory);
-  }, [initialSearch, initialCategory]);
 
   useEffect(() => {
     let cancelled = false;
@@ -118,7 +112,7 @@ function BrowseContent() {
     }
   }, [error]);
 
-  function handleSortChange(next: string) {
+  function handleSortChange(next: SortOption) {
     setSort(next);
     sessionStorage.setItem(SORT_KEY, next);
   }
@@ -221,7 +215,7 @@ function BrowseContent() {
               <select
                 id="browse-sort"
                 value={sort}
-                onChange={(e) => handleSortChange(e.target.value)}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
                 <option value="newest">Newest first</option>
