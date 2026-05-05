@@ -24,7 +24,14 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)) -> AuthResp
         )
 
     password_hash = hash_password(user_data.password)
-    db_user = create_user(db, user_data, password_hash)
+    db_user = create_user(
+        db,
+        user_data,
+        password_hash,
+        email_verified=True,
+        verification_token=None,
+        verification_expires_at=None,
+    )
     token = create_access_token(db_user.id, db_user.role.value)
 
     return AuthResponse(
