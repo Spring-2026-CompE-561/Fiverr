@@ -99,7 +99,10 @@ return (
             </Link>
             <Link
               href={user ? "/post" : "/login"}
-              className={cn(buttonVariants({ size: "sm" }), "hidden lg:inline-flex")}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                pathname === "/browse" && "bg-muted text-foreground"
+              )}
             >
               Post a gig
             </Link>
@@ -205,12 +208,12 @@ return (
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
                 Login
               </Link>
-              <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
-                Register
+              <Link href="/signup" className={cn(buttonVariants({ size: "sm" }))}>
+                Sign Up
               </Link>
             </div>
           )}
@@ -289,11 +292,11 @@ return (
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/signup"
                   className={cn(buttonVariants({ className: "mt-1 justify-center" }))}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Register
+                  Sign Up
                 </Link>
               </>
             )}
