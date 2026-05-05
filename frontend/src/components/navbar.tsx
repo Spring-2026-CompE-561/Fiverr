@@ -70,27 +70,22 @@ export function Navbar() {
     router.refresh();
   };
 
-  return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
-          <Link href="/" className="shrink-0 text-xl font-bold text-primary">
-            GigLink
-    <header className="border-b border-border bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
-            <Image
-              src="/logo.png"
-              alt="GigLink logo"
-              width={28}
-              height={28}
-              priority
-            />
-            <span>GigLink</span>
-          </Link>
+return (
+  <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+    <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
+          <Image
+            src="/logo.png"
+            alt="GigLink logo"
+            width={28}
+            height={28}
+            priority
+          />
+          <span>GigLink</span>
+        </Link>
 
-          <nav className="hidden items-center gap-1 md:flex md:gap-2">
+        <nav className="hidden items-center gap-1 md:flex md:gap-2">
             <Link
               href="/browse"
               className={cn(
