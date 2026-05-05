@@ -72,11 +72,6 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
-          <Link href="/" className="shrink-0 text-xl font-bold text-primary">
-            GigLink
-    <header className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
@@ -102,12 +97,14 @@ export function Navbar() {
             >
               Browse
             </Link>
-            <Link
-              href={user ? "/post" : "/login"}
-              className={cn(buttonVariants({ size: "sm" }), "hidden lg:inline-flex")}
-            >
-              Post a gig
-            </Link>
+            {user?.role !== "buyer" && (
+              <Link
+                href={user ? "/post" : "/login"}
+                className={cn(buttonVariants({ size: "sm" }), "hidden lg:inline-flex")}
+              >
+                Post a gig
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -214,7 +211,7 @@ export function Navbar() {
               >
                 Login
               </Link>
-              <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
+              <Link href="/signup" className={cn(buttonVariants({ size: "sm" }))}>
                 Register
               </Link>
             </div>
@@ -232,13 +229,15 @@ export function Navbar() {
             >
               Browse marketplace
             </Link>
-            <Link
-              href={user ? "/post" : "/login"}
-              className={cn(buttonVariants({ size: "sm" }), "justify-center")}
-              onClick={() => setMobileOpen(false)}
-            >
-              Post a gig
-            </Link>
+            {user?.role !== "buyer" && (
+              <Link
+                href={user ? "/post" : "/login"}
+                className={cn(buttonVariants({ size: "sm" }), "justify-center")}
+                onClick={() => setMobileOpen(false)}
+              >
+                Post a gig
+              </Link>
+            )}
 
             {user ? (
               <>
@@ -294,7 +293,7 @@ export function Navbar() {
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/signup"
                   className={cn(buttonVariants({ className: "mt-1 justify-center" }))}
                   onClick={() => setMobileOpen(false)}
                 >

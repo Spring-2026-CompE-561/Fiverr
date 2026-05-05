@@ -21,7 +21,7 @@ export function UserAvatar({
   size = "sm",
   className,
 }: UserAvatarProps) {
-  const initials = name
+  const initials = (name ?? "")
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)

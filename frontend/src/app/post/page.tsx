@@ -109,8 +109,8 @@ export default function PostGigPage() {
   const requiredStar = <span className="text-red-500">*</span>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="bg-card text-card-foreground p-8 rounded-xl shadow-md w-full max-w-lg border border-border">
         <div className="flex items-start justify-between gap-4 mb-6">
           <h1 className="text-2xl font-bold text-center flex-1">Post a Gig</h1>
           <p className="text-sm text-red-500 whitespace-nowrap">
@@ -119,14 +119,14 @@ export default function PostGigPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 border border-red-200 rounded p-3 mb-4 text-sm">
+          <div className="bg-destructive/10 text-destructive border border-destructive/30 rounded p-3 mb-4 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Title {requiredStar}
             </label>
             <input
@@ -134,13 +134,13 @@ export default function PostGigPage() {
               required
               value={form.title}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
               placeholder="I will design a professional logo"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Description {requiredStar}
             </label>
             <textarea
@@ -149,13 +149,13 @@ export default function PostGigPage() {
               value={form.description}
               onChange={handleChange}
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
               placeholder="Describe your service in detail..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Category {requiredStar}
             </label>
             <select
@@ -163,7 +163,7 @@ export default function PostGigPage() {
               required
               value={form.category}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">Select a category</option>
               <option value="Home Repair">Home Repair</option>
@@ -191,7 +191,7 @@ export default function PostGigPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Price ($) {requiredStar}
             </label>
             <input
@@ -201,23 +201,23 @@ export default function PostGigPage() {
               min="1"
               value={form.price}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
               placeholder="25"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Tags
             </label>
             <input
               name="tags"
               value={form.tags}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
               placeholder="design, logo, branding"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Optional. Separate tags with commas.
             </p>
           </div>
