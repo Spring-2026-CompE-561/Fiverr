@@ -9,13 +9,14 @@ export default function PostGigPage() {
     title: "",
     description: "",
     price: "",
+    category: "",
     tags: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -44,7 +45,8 @@ export default function PostGigPage() {
             title: form.title,
             description: form.description,
             price: parseFloat(form.price),
-            tags: form.tags.split(",").map((t) => t.trim()),
+            category: form.category,
+            tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
           }),
         }
       );
@@ -75,9 +77,7 @@ export default function PostGigPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
             <input
               name="title"
               required
@@ -89,9 +89,7 @@ export default function PostGigPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               name="description"
               required
@@ -104,9 +102,26 @@ export default function PostGigPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Price ($)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select
+              name="category"
+              required
+              value={form.category}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">Select a category</option>
+              <option value="Design">Design</option>
+              <option value="Development">Development</option>
+              <option value="Writing">Writing</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Video">Video</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
             <input
               name="price"
               type="number"
@@ -120,9 +135,7 @@ export default function PostGigPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tags (comma separated)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
             <input
               name="tags"
               value={form.tags}
