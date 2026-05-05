@@ -89,10 +89,9 @@ return (
             <Link
               href="/browse"
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition",
-                pathname === "/browse"
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
+                pathname === "/browse" && "bg-muted"
               )}
             >
               Browse
@@ -101,7 +100,8 @@ return (
               href={user ? "/post" : "/login"}
               className={cn(
                 buttonVariants({ variant: "outline", size: "sm" }),
-                pathname === "/browse" && "bg-muted text-foreground"
+                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
+                pathname === "/post" && "bg-muted"
               )}
             >
               Post a gig
@@ -208,7 +208,8 @@ return (
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }),
+                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10")}
               >
                 Login
               </Link>
