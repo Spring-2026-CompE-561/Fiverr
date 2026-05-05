@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { AppToaster } from "@/components/app-toaster";
 import { Navbar } from "@/components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -39,12 +41,19 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Navbar />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
 
-        <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-8">
-          {children}
-        </main>
-        <AppToaster />
+          <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-8">
+            {children}
+          </main>
+          <AppToaster />
+        </ThemeProvider>
       </body>
     </html>
   );

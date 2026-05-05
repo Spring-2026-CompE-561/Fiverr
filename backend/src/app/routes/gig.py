@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
+from app.core.dependencies import require_verified_email
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.gig import (
@@ -34,6 +35,8 @@ def list_gigs(
     category: str | None = None,
     minPrice: float | None = None,
     maxPrice: float | None = None,
+    sellerId: str | None = None,
+    sort: str | None = None,
     db: Session = Depends(get_db),
 ):
     return list_gigs_service(
@@ -42,6 +45,8 @@ def list_gigs(
         category=category,
         min_price=minPrice,
         max_price=maxPrice,
+        seller_id=sellerId,
+        sort=sort,
     )
 
 
@@ -57,7 +62,7 @@ def get_gig(
 def create_gig(
     payload: GigCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_verified_email),
 ):
     gig = create_gig_service(db, payload=payload, current_user=current_user)
     return {"success": True, "gig": gig}
@@ -68,7 +73,7 @@ def update_gig(
     id: str,
     payload: GigUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_verified_email),
 ):
     gig = update_gig_service(db, gig_id=id, payload=payload, current_user=current_user)
     return {"success": True, "gig": gig}
@@ -78,7 +83,7 @@ def update_gig(
 def delete_gig(
     id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_verified_email),
 ):
     delete_gig_service(db, gig_id=id, current_user=current_user)
     return {"success": True, "message": "Gig deleted successfully"}

@@ -13,8 +13,13 @@ def get_all_gigs(
     category: Optional[str] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
+    seller_id: Optional[str] = None,
+    sort: Optional[str] = None,
 ):
     query = db.query(Gig)
+
+    if seller_id:
+        query = query.filter(Gig.seller_id == seller_id)
 
     if search:
         pattern = f"%{search}%"
@@ -36,7 +41,14 @@ def get_all_gigs(
     if max_price is not None:
         query = query.filter(Gig.price <= max_price)
 
-    return query.order_by(Gig.created_at.desc()).all()
+    if sort == "price_asc":
+        query = query.order_by(Gig.price.asc(), Gig.created_at.desc())
+    elif sort == "price_desc":
+        query = query.order_by(Gig.price.desc(), Gig.created_at.desc())
+    else:
+        query = query.order_by(Gig.created_at.desc())
+
+    return query.all()
 
 
 def get_gig_by_id(db: Session, gig_id: str):
