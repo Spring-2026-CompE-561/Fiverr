@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -75,6 +76,18 @@ export function Navbar() {
         <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
           <Link href="/" className="shrink-0 text-xl font-bold text-primary">
             GigLink
+    <header className="border-b border-border bg-card">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
+            <Image
+              src="/logo.png"
+              alt="GigLink logo"
+              width={28}
+              height={28}
+              priority
+            />
+            <span>GigLink</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex md:gap-2">
