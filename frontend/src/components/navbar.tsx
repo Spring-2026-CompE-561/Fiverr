@@ -85,14 +85,13 @@ export function Navbar() {
             <span>GigLink</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex md:gap-2">
+        <nav className="hidden items-center gap-1 md:flex md:gap-2">
             <Link
               href="/browse"
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition",
-                pathname === "/browse"
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
+                pathname === "/browse" && "bg-muted"
               )}
             >
               Browse
@@ -207,12 +206,13 @@ export function Navbar() {
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }),
+                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10")}
               >
                 Login
               </Link>
               <Link href="/signup" className={cn(buttonVariants({ size: "sm" }))}>
-                Register
+                Sign Up
               </Link>
             </div>
           )}
@@ -297,7 +297,7 @@ export function Navbar() {
                   className={cn(buttonVariants({ className: "mt-1 justify-center" }))}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Register
+                  Sign Up
                 </Link>
               </>
             )}

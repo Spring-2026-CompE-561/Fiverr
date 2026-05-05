@@ -15,7 +15,7 @@ export function Input({
         "placeholder:text-muted-foreground",
         "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className,
+        className
       )}
       {...props}
     />

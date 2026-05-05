@@ -42,9 +42,13 @@ function BrowseContent() {
   const initialCategory = searchParams.get("category") ?? "";
 
   const [searchInput, setSearchInput] = useState(initialSearch);
-  const [browseSearchPlaceholder] = useState(() =>
-    pickRandom(SEARCH_PLACEHOLDERS),
+  const [browseSearchPlaceholder, setBrowseSearchPlaceholder] = useState(
+    SEARCH_PLACEHOLDERS[0]
   );
+
+  useEffect(() => {
+    setBrowseSearchPlaceholder(pickRandom(SEARCH_PLACEHOLDERS));
+  }, []);
   const debouncedSearch = useDebouncedValue(searchInput, 350);
 
   const [category, setCategory] = useState(initialCategory);
