@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import List
 
-from sqlalchemy import DateTime, Enum, String, Text
+from sqlalchemy import Boolean, DateTime, Enum, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -50,6 +50,25 @@ class User(Base):
 
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+
+    email_verified: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    email_verification_token: Mapped[str | None] = mapped_column(
+        String(128),
+        nullable=True,
+        index=True,
+    )
+
+    email_verification_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -62,10 +81,6 @@ class User(Base):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
-    # ---------------------------
-    # RELATIONSHIPS
-    # ---------------------------
 
     gigs: Mapped[List["Gig"]] = relationship(
         "Gig",
@@ -81,4 +96,3 @@ class User(Base):
         "Review",
         back_populates="buyer",
     )
-   
