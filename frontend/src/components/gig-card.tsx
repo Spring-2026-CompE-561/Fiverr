@@ -36,7 +36,7 @@ export function GigCard({ gig, className }: GigCardProps) {
 
       {gig.tags?.length ? (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {gig.tags.slice(0, 4).map((t) => (
+          {gig.tags.slice(0, 4).map((t: string) => (
             <span
               key={t}
               className="rounded-md bg-background px-2 py-0.5 text-xs text-muted-foreground"
