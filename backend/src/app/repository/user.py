@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -18,13 +20,28 @@ def get_user_by_id(db: Session, user_id: str) -> User | None:
     return db.query(User).filter(User.id == user_id).first()
 
 
-def create_user(db: Session, user_data: UserRegister, password_hash: str) -> User:
+def get_user_by_verification_token(db: Session, token: str) -> User | None:
+    return db.query(User).filter(User.email_verification_token == token).first()
+
+
+def create_user(
+    db: Session,
+    user_data: UserRegister,
+    password_hash: str,
+    *,
+    email_verified: bool,
+    verification_token: str | None,
+    verification_expires_at: datetime | None,
+) -> User:
     """Create and persist a new user."""
     db_user = User(
         name=user_data.name,
         email=user_data.email,
         password_hash=password_hash,
         role=user_data.role,
+        email_verified=email_verified,
+        email_verification_token=verification_token,
+        email_verification_expires_at=verification_expires_at,
     )
     db.add(db_user)
     db.commit()

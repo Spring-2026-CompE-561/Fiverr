@@ -31,6 +31,7 @@ class UserUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     email: EmailStr | None = None
     bio: str | None = Field(default=None, max_length=2000)
+    avatar_url: str | None = Field(default=None, max_length=512)
 
 
 class UserPublic(BaseModel):
@@ -43,6 +44,8 @@ class UserPublic(BaseModel):
     email: EmailStr
     role: UserRole
     bio: str | None = None
+    avatar_url: str | None = None
+    email_verified: bool
     created_at: datetime
     updated_at: datetime
 
@@ -67,3 +70,7 @@ class MessageResponse(BaseModel):
 
     success: bool = True
     message: str
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str = Field(..., min_length=10, max_length=200)
