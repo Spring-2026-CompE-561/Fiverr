@@ -1,11 +1,13 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { registerUser } from "@/lib/auth";
-
-const fieldClass =
-  "w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -40,68 +42,103 @@ export default function SignupPage() {
       });
       router.push("/");
     } catch (err: any) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Create your GigLink Account</h1>
-
-        {error && (
-          <div className="bg-destructive/10 text-destructive border border-destructive/30 rounded p-3 mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Name</label>
-            <input name="name" required value={form.name} onChange={handleChange} className={fieldClass} placeholder="John Doe" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
-            <input type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} placeholder="you@example.com" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">I want to</label>
-            <select name="role" value={form.role} onChange={handleChange} className={fieldClass}>
-              <option value="buyer">Buy services (Buyer)</option>
-              <option value="seller">Sell services (Seller)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Password</label>
-            <input type="password" name="password" required value={form.password} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Confirm Password</label>
-            <input type="password" name="confirmPassword" required value={form.confirmPassword} onChange={handleChange} className={fieldClass} placeholder="••••••••" />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? "Creating account..." : "Create Account"}
-          </button>
+    <div className="flex items-center justify-center py-12">
+      <Card className="w-full max-w-md shadow-lg border-primary/10">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-extrabold tracking-tight">Create an account</CardTitle>
+          <CardDescription>
+            Join GigLink today and start your journey
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive border border-destructive/20 animate-in fade-in zoom-in-95">
+                {error}
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="John Doe"
+                required
+                value={form.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                value={form.email}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">I want to</Label>
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-full border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none transition-all duration-200"
+              >
+                <option value="buyer">Buy services (Buyer)</option>
+                <option value="seller">Sell services (Seller)</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={form.password}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={form.confirmPassword}
+                onChange={handleChange}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button type="submit" className="w-full h-11" disabled={loading}>
+              {loading ? "Creating account..." : "Create Account"}
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="font-bold text-primary hover:underline underline-offset-4"
+              >
+                Sign In
+              </Link>
+            </p>
+          </CardFooter>
         </form>
-
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Already have an account?{" "}
-          <Link href="/login" className="text-green-600 hover:underline font-medium">
-            Sign In
-          </Link>
-        </p>
-      </div>
+      </Card>
     </div>
   );
 }
