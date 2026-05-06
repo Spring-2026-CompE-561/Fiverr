@@ -46,7 +46,7 @@ export default function Home() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Fast Search
           </h2>
@@ -56,7 +56,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Clear Listings
           </h2>
@@ -65,7 +65,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Efficient Flow
           </h2>

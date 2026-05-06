@@ -178,7 +178,7 @@ export function Navbar() {
               {accountOpen ? (
                 <div
                   role="menu"
-                  className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-[220px] rounded-xl border border-border bg-popover p-1 shadow-lg"
+                  className="absolute left-auto right-0 top-[calc(100%+6px)] z-50 min-w-[220px] origin-top-right rounded-xl border border-border bg-popover p-1 shadow-lg"
                 >
                   <Link
                     href="/dashboard"
