@@ -140,12 +140,10 @@ export function Navbar() {
                 className="h-9 gap-2 border-border pl-1 pr-2"
                 aria-expanded={accountOpen}
                 aria-haspopup="menu"
+                aria-label="Open account menu"
                 onClick={() => setAccountOpen((v) => !v)}
               >
                 <UserAvatar name={user.name} avatarUrl={user.avatar_url} size="sm" />
-                <span className="max-w-[120px] truncate text-xs font-medium">
-                  {user.name}
-                </span>
                 <ChevronDown className="size-4 shrink-0 opacity-60" />
               </Button>
 

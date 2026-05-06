@@ -29,7 +29,7 @@ export function UserAvatar({
     .join("");
 
   const container = cn(
-    "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted font-semibold text-muted-foreground ring-2 ring-border",
+    "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted font-semibold text-muted-foreground",
     sizes[size],
     className,
   );
