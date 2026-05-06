@@ -1,7 +1,10 @@
 /**
  * Integration test: verifies the backend API is reachable from the frontend.
  * Run with: npm run test:integration
+ * Requires a running API (e.g. docker compose up backend) or local uvicorn.
  */
+
+import { describe, expect, it } from "vitest";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
