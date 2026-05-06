@@ -10,6 +10,8 @@ import {
   LogOut,
   Menu,
   Package,
+  PlusCircle,
+  Search,
   ShoppingBag,
   UserRound,
   X,
@@ -66,6 +68,9 @@ export function Navbar() {
     router.refresh();
   };
 
+  const isSeller = user?.role === "seller";
+  const isBuyer = user?.role === "buyer";
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -82,63 +87,71 @@ export function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex md:gap-2">
-            <Link
-              href="/browse"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                pathname === "/browse" && "bg-primary/10 border-primary",
-              )}
-            >
-              Browse
-            </Link>
-            {user?.role !== "buyer" && (
+            {!user || isBuyer ? (
               <Link
-                href={user ? "/post" : "/login"}
-                className={cn(buttonVariants({ size: "sm" }), "hidden lg:inline-flex")}
-              >
-                Post a gig
-              </Link>
-            )}
-            {user?.role === "seller" ? (
-              <Link
-                href="/my-gigs"
+                href="/browse"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  pathname === "/my-gigs" && "bg-muted",
+                  "gap-2",
+                  pathname === "/browse" && "bg-muted text-foreground",
                 )}
               >
-                My gigs
+                <Search className="size-4 opacity-70" />
+                Browse
               </Link>
             ) : null}
-            {user ? (
+
+            {isSeller && (
               <>
-                <Link
-                  href="/orders"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "sm" }),
-                    "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                    pathname === "/orders" && "bg-primary/10 border-primary",
-                  )}
-                >
-                  Orders
-                </Link>
                 <Link
                   href="/dashboard"
                   className={cn(
-                    buttonVariants({ variant: "outline", size: "sm" }),
-                    "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                    pathname === "/dashboard" && "bg-primary/10 border-primary",
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    pathname === "/dashboard" && "bg-muted text-foreground",
                   )}
                 >
                   Dashboard
                 </Link>
+                <Link
+                  href="/my-gigs"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    pathname === "/my-gigs" && "bg-muted text-foreground",
+                  )}
+                >
+                  My gigs
+                </Link>
               </>
-            ) : null}
+            )}
+
+            {user && (
+              <Link
+                href="/orders"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  pathname === "/orders" && "bg-muted text-foreground",
+                )}
+              >
+                Orders
+              </Link>
+            )}
           </nav>
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {isSeller && (
+            <Link
+              href="/post"
+              className={cn(
+                buttonVariants({ size: "sm" }),
+                "hidden h-9 gap-2 px-4 lg:inline-flex",
+              )}
+            >
+              <PlusCircle className="size-4" />
+              Post a gig
+            </Link>
+          )}
+
           <ThemeToggle />
 
           <button
@@ -180,33 +193,38 @@ export function Navbar() {
                   role="menu"
                   className="absolute left-auto right-0 top-[calc(100%+6px)] z-50 min-w-[220px] origin-top-right rounded-xl border border-border bg-popover p-1 shadow-lg"
                 >
-                  <Link
-                    href="/dashboard"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <LayoutDashboard className="size-4 opacity-70" />
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/my-gigs"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <ShoppingBag className="size-4 opacity-70" />
-                    My gigs
-                  </Link>
-                  <Link
-                    href="/orders"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <Package className="size-4 opacity-70" />
-                    Orders
-                  </Link>
+                  <div className="px-3 py-2">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Signed in as
+                    </p>
+                    <p className="truncate text-sm font-semibold">{user.email}</p>
+                  </div>
+                  <div className="my-1 h-px bg-border" />
+                  
+                  {isBuyer && (
+                    <Link
+                      href="/dashboard"
+                      role="menuitem"
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      <LayoutDashboard className="size-4 opacity-70" />
+                      Dashboard
+                    </Link>
+                  )}
+
+                  {isSeller && (
+                    <Link
+                      href="/browse"
+                      role="menuitem"
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      <Search className="size-4 opacity-70" />
+                      Browse Marketplace
+                    </Link>
+                  )}
+
                   <Link
                     href="/profile"
                     role="menuitem"
@@ -216,6 +234,9 @@ export function Navbar() {
                     <UserRound className="size-4 opacity-70" />
                     Profile
                   </Link>
+
+                  <div className="my-1 h-px bg-border" />
+                  
                   <button
                     type="button"
                     role="menuitem"
@@ -232,8 +253,7 @@ export function Navbar() {
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "outline", size: "sm" }),
-                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10")}
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
               >
                 Login
               </Link>
@@ -248,64 +268,123 @@ export function Navbar() {
       {mobileOpen ? (
         <div className="border-t border-border bg-card px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-1">
-            <Link
-              href="/browse"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-              onClick={() => setMobileOpen(false)}
-            >
-              Browse marketplace
-            </Link>
-            {user?.role !== "buyer" && (
+            {(!user || isBuyer) && (
               <Link
-                href={user ? "/post" : "/login"}
-                className={cn(buttonVariants({ size: "sm" }), "justify-center")}
+                href="/browse"
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                  pathname === "/browse" && "bg-muted",
+                )}
                 onClick={() => setMobileOpen(false)}
               >
-                Post a gig
+                <Search className="size-4 opacity-70" />
+                Browse marketplace
               </Link>
             )}
 
-            {user ? (
+            {isSeller && (
               <>
-                <p className="mt-3 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Account ({user.role})
-                </p>
                 <Link
                   href="/dashboard"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                    pathname === "/dashboard" && "bg-muted",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <LayoutDashboard className="size-4 opacity-70" />
                   Dashboard
                 </Link>
                 <Link
                   href="/my-gigs"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                    pathname === "/my-gigs" && "bg-muted",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <ShoppingBag className="size-4 opacity-70" />
                   My gigs
                 </Link>
                 <Link
-                  href="/orders"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  href="/post"
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "mt-2 justify-center gap-2",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <PlusCircle className="size-4" />
+                  Post a gig
+                </Link>
+              </>
+            )}
+
+            {user ? (
+              <>
+                <Link
+                  href="/orders"
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                    pathname === "/orders" && "bg-muted",
+                  )}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Package className="size-4 opacity-70" />
                   Orders
                 </Link>
+                
+                <div className="my-2 h-px bg-border/50" />
+
                 <Link
                   href="/profile"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                    pathname === "/profile" && "bg-muted",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <UserRound className="size-4 opacity-70" />
                   Profile
                 </Link>
+
+                {isSeller && (
+                   <Link
+                   href="/browse"
+                   className={cn(
+                     "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                     pathname === "/browse" && "bg-muted",
+                   )}
+                   onClick={() => setMobileOpen(false)}
+                 >
+                   <Search className="size-4 opacity-70" />
+                   Browse Marketplace
+                 </Link>
+                )}
+                
+                {isBuyer && (
+                   <Link
+                   href="/dashboard"
+                   className={cn(
+                     "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted",
+                     pathname === "/dashboard" && "bg-muted",
+                   )}
+                   onClick={() => setMobileOpen(false)}
+                 >
+                   <LayoutDashboard className="size-4 opacity-70" />
+                   Dashboard
+                 </Link>
+                )}
+
                 <button
                   type="button"
-                  className="rounded-lg px-3 py-2.5 text-left text-sm text-destructive hover:bg-destructive/10"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-destructive hover:bg-destructive/10"
                   onClick={() => {
                     handleLogout();
                     setMobileOpen(false);
                   }}
                 >
+                  <LogOut className="size-4" />
                   Log out
                 </button>
               </>
