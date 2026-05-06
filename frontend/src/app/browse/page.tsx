@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { RotateCcw, X } from "lucide-react";
+import { RotateCcw, SearchX, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
@@ -11,6 +11,7 @@ import { GIG_CATEGORIES } from "@/lib/constants";
 import { pickRandom, SEARCH_PLACEHOLDERS } from "@/lib/realistic-gigs";
 import type { GigPublic } from "@/lib/types";
 import { GigCard } from "@/components/gig-card";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -355,18 +356,15 @@ function BrowseContent() {
       ) : null}
 
       {!loading && !error && gigs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center">
-          <p className="font-medium text-foreground">No gigs match yet</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Try clearing filters or broadening your search.
-          </p>
-          <Link
-            href="/post"
-            className="mt-4 inline-flex text-sm font-medium text-primary hover:underline"
-          >
-            Post the first gig
-          </Link>
-        </div>
+        <EmptyState
+          icon={SearchX}
+          title="No gigs found"
+          description="We couldn't find any gigs matching your current filters. Try adjusting your search or category."
+          action={{
+            label: "Post a gig",
+            href: "/post",
+          }}
+        />
       ) : null}
 
       {!loading && !error && gigs.length > 0 ? (

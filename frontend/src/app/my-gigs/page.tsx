@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Rocket } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
 import { useSession } from "@/hooks/use-session";
 import type { GigPublic } from "@/lib/types";
 import { GigCard } from "@/components/gig-card";
+import { EmptyState } from "@/components/empty-state";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MyGigsPage() {
   const { user, loading } = useSession(true);
@@ -72,15 +74,21 @@ export default function MyGigsPage() {
       </header>
 
       {listLoading ? (
-        <p className="text-sm text-muted-foreground">Loading gigs…</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-48 rounded-xl" />
+          ))}
+        </div>
       ) : gigs.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          You haven&apos;t posted a gig yet.{" "}
-          <Link href="/post" className="text-primary hover:underline">
-            Create one
-          </Link>
-          .
-        </p>
+        <EmptyState
+          icon={Rocket}
+          title="Ready to start selling?"
+          description="Create your first gig to showcase your skills and start receiving orders from buyers."
+          action={{
+            label: "Create a gig",
+            href: "/post",
+          }}
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {gigs.map((g) => (

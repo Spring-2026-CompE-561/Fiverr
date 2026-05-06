@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 
+import { MessageSquareOff } from "lucide-react";
+
 import { apiFetch } from "@/lib/api";
 import { formatRelativeTime } from "@/lib/format";
+import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Review = {
@@ -71,8 +74,9 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
 
       {loading ? (
         <div className="mt-4 space-y-3">
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))}
         </div>
       ) : null}
 
@@ -81,9 +85,12 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
       ) : null}
 
       {!loading && !error && reviews.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          No reviews yet — be the first to share feedback.
-        </p>
+        <EmptyState
+          icon={MessageSquareOff}
+          title="No reviews yet"
+          description="Be the first to share your experience with this service."
+          className="mt-6 min-h-[250px]"
+        />
       ) : null}
 
       <div className="mt-4 space-y-4">
