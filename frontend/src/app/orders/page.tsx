@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Package, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
@@ -9,6 +10,7 @@ import { useSession } from "@/hooks/use-session";
 import { formatDateTime, formatRelativeTime } from "@/lib/format";
 import type { OrderPublic } from "@/lib/types";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -174,33 +176,23 @@ export default function OrdersPage() {
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-14 text-center">
-          {accountRole === "seller" ? (
-            <>
-              <p className="font-medium">No buyer requests yet</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                This page lists orders buyers place on your gigs. Create a gig,
-                then have a buyer submit{" "}
-                <code className="rounded bg-muted px-1">POST /api/v1/orders</code>{" "}
-                with your gig ID.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="font-medium">Nothing here yet</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                When you request a gig as a buyer, it will appear here with
-                status and the time you sent it.
-              </p>
-              <Link
-                href="/browse"
-                className="mt-4 inline-flex text-sm font-medium text-primary hover:underline"
-              >
-                Browse gigs
-              </Link>
-            </>
-          )}
-        </div>
+        accountRole === "seller" ? (
+          <EmptyState
+            icon={Package}
+            title="No buyer requests yet"
+            description="When buyers purchase your gigs, their requests will appear here for you to manage and fulfill."
+          />
+        ) : (
+          <EmptyState
+            icon={ShoppingCart}
+            title="You haven't ordered anything"
+            description="Find the perfect service for your next project and track your orders right here."
+            action={{
+              label: "Browse gigs",
+              href: "/browse",
+            }}
+          />
+        )
       ) : (
         <ul className="space-y-4">
           {orders.map((o) => (

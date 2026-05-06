@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { History, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
 import { useSession } from "@/hooks/use-session";
 import type { GigPublic, OrderPublic } from "@/lib/types";
 import { GigCard } from "@/components/gig-card";
+import { EmptyState } from "@/components/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -107,22 +109,26 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <p className="text-sm text-muted-foreground">Open orders</p>
-          <p className="mt-1 text-2xl font-semibold">
-            {statsLoading ? "—" : orders.length}
-          </p>
+          {statsLoading ? (
+            <Skeleton className="mt-2 h-8 w-12" />
+          ) : (
+            <p className="mt-1 text-2xl font-semibold">{orders.length}</p>
+          )}
         </div>
         {user.role === "seller" ? (
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <p className="text-sm text-muted-foreground">Your live gigs</p>
-            <p className="mt-1 text-2xl font-semibold">
-              {statsLoading ? "—" : myGigs.length}
-            </p>
+            {statsLoading ? (
+              <Skeleton className="mt-2 h-8 w-12" />
+            ) : (
+              <p className="mt-1 text-2xl font-semibold">{myGigs.length}</p>
+            )}
           </div>
         ) : (
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-            <p className="text-sm text-muted-foreground">Browse</p>
+            <p className="text-sm text-muted-foreground">Marketplace</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Find sellers and request work in a few clicks.
+              Find top sellers and request work.
             </p>
           </div>
         )}
@@ -130,9 +136,9 @@ export default function DashboardPage() {
           <p className="text-sm text-muted-foreground">Quick action</p>
           <Link
             href="/browse"
-            className={cn(buttonVariants({ className: "mt-3 w-full sm:w-auto" }))}
+            className={cn(buttonVariants({ className: "mt-3 w-full sm:w-auto", variant: "outline", size: "sm" }))}
           >
-            Browse more gigs
+            Explore gigs
           </Link>
         </div>
       </div>
@@ -140,35 +146,43 @@ export default function DashboardPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Recent orders</h2>
-          <Link
-            href="/orders"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            View all
-          </Link>
+          {orders.length > 0 && (
+            <Link
+              href="/orders"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              View all
+            </Link>
+          )}
         </div>
         {statsLoading ? (
-          <p className="text-sm text-muted-foreground">Loading orders…</p>
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
         ) : recentOrders.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No orders yet.{" "}
-            <Link href="/browse" className="text-primary hover:underline">
-              Browse gigs
-            </Link>{" "}
-            to get started.
-          </p>
+          <EmptyState
+            icon={History}
+            title="No recent activity"
+            description="Your recent orders will appear here once you start using GigLink."
+            className="min-h-[300px]"
+          />
         ) : (
           <ul className="space-y-2">
             {recentOrders.map((o) => (
               <li
                 key={o.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm transition-colors hover:bg-muted/50"
               >
-                <span className="font-mono text-xs text-muted-foreground">
-                  {o.id.slice(0, 8)}…
-                </span>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs capitalize">
-                  {o.status}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-muted-foreground">
+                    #{o.id.slice(0, 8)}
+                  </span>
+                  <span className="capitalize">{o.status}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(o.created_at).toLocaleDateString()}
                 </span>
               </li>
             ))}
