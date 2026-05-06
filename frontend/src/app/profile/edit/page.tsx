@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
-import { getToken, saveToken, type UserPublic } from "@/lib/auth";
+import { getToken, saveToken, saveUser, type UserPublic } from "@/lib/auth";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,8 +52,9 @@ export default function EditProfilePage() {
       );
       const token = getToken();
       if (token) {
-        saveToken(token, out.user);
+        saveToken(token);
       }
+      saveUser(out.user);
       toast.success("Profile saved");
       router.replace("/profile");
       router.refresh();

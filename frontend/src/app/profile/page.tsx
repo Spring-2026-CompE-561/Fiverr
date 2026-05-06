@@ -75,7 +75,7 @@ export default function ProfilePage() {
                 <UserAvatar
                   name={user.name}
                   avatarUrl={user.avatar_url}
-                  size="xl"
+                  size="lg"
                   className="size-24 border-4 border-card ring-1 ring-border shadow-xl"
                 />
                 <div className="mt-4 space-y-1">

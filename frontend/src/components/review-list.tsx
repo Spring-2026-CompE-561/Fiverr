@@ -5,6 +5,7 @@ import { MessageSquare, MessageSquareOff, Star } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
 import { formatRelativeTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -126,7 +127,7 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
                     <span className="ml-2 text-sm font-bold">{review.rating}/5</span>
                   </div>
                   <span className="text-xs font-medium text-muted-foreground">
-                    {formatRelativeTime(created) || "Recently"}
+                    {created ? formatRelativeTime(created) : "Recently"}
                   </span>
                 </div>
 

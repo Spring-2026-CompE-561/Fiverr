@@ -12,15 +12,19 @@ At the repository root (the directory that contains `backend/` and `frontend/`):
 
 ```
 .
-├── backend/          # FastAPI + SQLAlchemy + JWT
-│   ├── src/app/      # Python package `app`
+├── docker-compose.yml   # Postgres + API + UI + one-shot seed
+├── backend/             # FastAPI + SQLAlchemy + JWT
+│   ├── src/app/         # Python package `app`
+│   ├── scripts/         # e.g. seed_marketplace.py
 │   ├── tests/
 │   ├── requirements.txt
+│   ├── Dockerfile
 │   └── pyproject.toml
-└── frontend/         # Next.js (App Router) + React + Tailwind
-    ├── src/app/      # routes and pages
-    ├── src/lib/      # API client, auth helpers
-    └── package.json
+└── frontend/            # Next.js (App Router) + React + Tailwind
+    ├── src/app/         # routes and pages
+    ├── src/lib/         # API client, auth helpers
+    ├── package.json
+    └── Dockerfile
 ```
 
 ---
@@ -31,6 +35,7 @@ At the repository root (the directory that contains `backend/` and `frontend/`):
 |----------|-------------|
 | Backend  | Python **3.11+**, `pip` |
 | Frontend | **Node.js 20+** (LTS recommended), **npm** (or `pnpm` / `yarn` if you adapt commands) |
+| Docker   | **Docker Desktop** (or Docker Engine + Compose v2) |
 
 ---
 
@@ -91,7 +96,44 @@ npm run dev
 
 - App: http://localhost:3000  
 
-The UI reads **`NEXT_PUBLIC_API_URL`** (see `frontend/.env.example`). It defaults to `http://127.0.0.1:8000` when unset, which matches a typical local API. Keep **`FRONTEND_URL`** in the backend `.env` aligned with where users open the app (used for verification links and similar).
+The UI reads **`NEXT_PUBLIC_API_URL`** (see [`frontend/.env.example`](frontend/.env.example)). It defaults to `http://localhost:8000` when unset, which matches a typical local API. Keep **`FRONTEND_URL`** in the backend `.env` aligned with where users open the app (used for verification links and similar).
+
+---
+
+## Docker (Postgres + API + UI + demo data)
+
+From the repo root (folder that contains `docker-compose.yml`):
+
+```bash
+docker compose up --build
+```
+
+- **App:** http://localhost:3000  
+- **API / Swagger:** http://localhost:8000/docs  
+
+Compose brings up **PostgreSQL 16**, the **FastAPI** backend, the **Next.js** frontend, and a **one-shot `seed`** container that runs [`backend/scripts/seed_marketplace.py`](backend/scripts/seed_marketplace.py) (demo seller, buyers, gigs, and realistic orders). The browser calls the API at **`http://localhost:8000`** (mapped from the backend container); the frontend image is built with `NEXT_PUBLIC_API_URL=http://localhost:8000` for that reason.
+
+**Postgres (dev defaults in compose):** user `giglink`, password `giglink`, database `giglink`. Data persists in the `giglink_pgdata` volume.
+
+**Optional:** set `JWT_SECRET` in your shell before `docker compose up` (compose reads `${JWT_SECRET}` with a dev fallback).
+
+**Re-run seed only** (e.g. after wiping the volume):
+
+```bash
+docker compose run --rm seed
+```
+
+### Demo logins (after seed)
+
+| Role   | Email                         | Password          |
+|--------|-------------------------------|-------------------|
+| Seller | `demo.seller@example.com`     | `DemoSeller!2026` |
+| Buyer  | `demo.buyer1@example.com`    | `DemoBuyer1!2026` |
+| Buyer  | `demo.buyer2@example.com`    | `DemoBuyer2!2026` |
+| Buyer  | `demo.buyer3@example.com`    | `DemoBuyer3!2026` |
+| Buyer  | `demo.buyer4@example.com`    | `DemoBuyer4!2026` |
+
+Sign in as the **seller** to see incoming buyer requests on **Orders**; sign in as a **buyer** to see your own requests. Completed orders unlock leaving a review on a gig detail page (per backend rules).
 
 ---
 
@@ -100,7 +142,7 @@ The UI reads **`NEXT_PUBLIC_API_URL`** (see `frontend/.env.example`). It default
 | Concern | Detail |
 |---------|--------|
 | HTTP | The browser calls the FastAPI origin directly (`getApiBase()` in `frontend/src/lib/api.ts`). There is no Next.js BFF proxy for the marketplace API in this repo. |
-| Auth | After login/register, the SPA stores the JWT in **`localStorage`** under the key **`giglink_token`** and sends `Authorization: Bearer …` on requests unless a call opts out with `auth: false`. |
+| Auth | After login/register, the SPA stores the JWT in **`localStorage`** under the key **`token`** (and user JSON under **`user`**) and sends `Authorization: Bearer …` on requests unless a call opts out with `auth: false`. |
 | CORS | `backend/src/app/main.py` allows all origins in development so `localhost:3000` can call `localhost:8000`. Tighten this for production. |
 | Env | **`NEXT_PUBLIC_*`** vars are baked in at build time for the Next bundle; restart `next dev` after changing them. |
 

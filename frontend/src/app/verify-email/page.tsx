@@ -1,13 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { getApiBase } from "@/lib/api";
-import Link from "next/link";
 
-export default function VerifyEmailPage() {
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { getApiBase } from "@/lib/api";
+
+function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading",
+  );
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -20,12 +24,13 @@ export default function VerifyEmailPage() {
 
     async function verify() {
       try {
-        const res = await fetch(`${getApiBase()}/api/v1/auth/verify-email`,
+        const res = await fetch(
+          `${getApiBase()}/api/v1/auth/verify-email`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token }),
-          }
+          },
         );
 
         if (!res.ok) {
@@ -36,19 +41,19 @@ export default function VerifyEmailPage() {
         setStatus("success");
         setMessage("Your email has been verified successfully!");
         setTimeout(() => router.push("/login"), 3000);
-      } catch (err: any) {
+      } catch (err: unknown) {
         setStatus("error");
-        setMessage(err.message);
+        setMessage(err instanceof Error ? err.message : "Verification failed");
       }
     }
 
-    verify();
+    void verify();
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 text-center shadow-md">
+        <h1 className="mb-4 text-2xl font-bold">Email Verification</h1>
 
         {status === "loading" && (
           <p className="text-gray-500">Verifying your email...</p>
@@ -56,18 +61,16 @@ export default function VerifyEmailPage() {
 
         {status === "success" && (
           <div>
-            <div className="text-green-500 text-5xl mb-4">✓</div>
-            <p className="text-green-600 font-medium">{message}</p>
-            <p className="text-gray-500 text-sm mt-2">
-              Redirecting to login...
-            </p>
+            <div className="mb-4 text-5xl text-green-500">✓</div>
+            <p className="font-medium text-green-600">{message}</p>
+            <p className="mt-2 text-sm text-gray-500">Redirecting to login...</p>
           </div>
         )}
 
         {status === "error" && (
           <div>
-            <div className="text-red-500 text-5xl mb-4">✗</div>
-            <p className="text-red-600 font-medium">{message}</p>
+            <div className="mb-4 text-5xl text-red-500">✗</div>
+            <p className="font-medium text-red-600">{message}</p>
             <Link
               href="/login"
               className="mt-4 inline-block text-green-600 hover:underline"
@@ -78,5 +81,19 @@ export default function VerifyEmailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <p className="text-gray-500">Loading…</p>
+        </div>
+      }
+    >
+      <VerifyEmailInner />
+    </Suspense>
   );
 }
