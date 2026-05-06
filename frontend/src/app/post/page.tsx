@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getToken } from "@/lib/auth";
 import { getApiBase } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { GIG_CATEGORIES } from "@/lib/constants";
+import { AlertCircle, PlusCircle } from "lucide-react";
 
 export default function PostGigPage() {
   const router = useRouter();
@@ -72,9 +79,6 @@ export default function PostGigPage() {
         : [],
     };
 
-    console.log("Gig payload:", payload);
-    console.log("Tags is array?", Array.isArray(payload.tags));
-
     try {
       const res = await fetch(`${getApiBase()}/api/v1/gigs`, {
         method: "POST",
@@ -87,8 +91,6 @@ export default function PostGigPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        console.log("Gig error full:", JSON.stringify(err, null, 2));
-
         const message =
           err.detail ||
           err.error ||
@@ -98,7 +100,7 @@ export default function PostGigPage() {
         throw new Error(message);
       }
 
-      router.push("/");
+      router.push("/my-gigs");
     } catch (err: any) {
       setError(err.message || "Failed to create gig");
     } finally {
@@ -106,131 +108,114 @@ export default function PostGigPage() {
     }
   }
 
-  const requiredStar = <span className="text-red-500">*</span>;
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="bg-card text-card-foreground p-8 rounded-xl shadow-md w-full max-w-lg border border-border">
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-center flex-1">Post a Gig</h1>
-          <p className="text-sm text-red-500 whitespace-nowrap">
-            <span className="font-bold">*</span> required
-          </p>
-        </div>
-
-        {error && (
-          <div className="bg-destructive/10 text-destructive border border-destructive/30 rounded p-3 mb-4 text-sm">
-            {error}
+    <div className="mx-auto max-w-2xl py-8">
+      <Card className="shadow-lg border-primary/10 overflow-hidden">
+        <div className="h-2 bg-primary" />
+        <CardHeader className="space-y-1">
+          <div className="flex items-center gap-2 text-primary mb-2">
+            <PlusCircle className="size-5" />
+            <span className="text-sm font-bold uppercase tracking-widest">Seller tools</span>
           </div>
-        )}
+          <CardTitle className="text-3xl font-extrabold tracking-tight">Post a New Gig</CardTitle>
+          <CardDescription>
+            Offer your skills to the marketplace. Provide clear details to attract more buyers.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit} noValidate>
+          <CardContent className="space-y-6">
+            {error && (
+              <div className="flex items-center gap-3 rounded-xl bg-destructive/10 p-4 text-sm font-medium text-destructive border border-destructive/20 animate-in fade-in zoom-in-95">
+                <AlertCircle className="size-5 shrink-0" />
+                {error}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="title" className="font-bold">Gig Title <span className="text-destructive">*</span></Label>
+              <Input
+                id="title"
+                name="title"
+                required
+                value={form.title}
+                onChange={handleChange}
+                placeholder="I will design a professional logo for your brand"
+                className="rounded-xl"
+              />
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Clear titles help buyers find your services.</p>
+            </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Title {requiredStar}
-            </label>
-            <input
-              name="title"
-              required
-              value={form.title}
-              onChange={handleChange}
-              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-              placeholder="I will design a professional logo"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="description" className="font-bold">Detailed Description <span className="text-destructive">*</span></Label>
+              <Textarea
+                id="description"
+                name="description"
+                required
+                value={form.description}
+                onChange={handleChange}
+                rows={6}
+                placeholder="Describe exactly what you offer, including deliverables and turnaround time..."
+                className="rounded-xl resize-none"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Description {requiredStar}
-            </label>
-            <textarea
-              name="description"
-              required
-              value={form.description}
-              onChange={handleChange}
-              rows={4}
-              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-              placeholder="Describe your service in detail..."
-            />
-          </div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="category" className="font-bold">Category <span className="text-destructive">*</span></Label>
+                <select
+                  id="category"
+                  name="category"
+                  required
+                  value={form.category}
+                  onChange={handleChange}
+                  className="flex h-10 w-full rounded-full border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none transition-all duration-200"
+                >
+                  <option value="">Select a category</option>
+                  {GIG_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Category {requiredStar}
-            </label>
-            <select
-              name="category"
-              required
-              value={form.category}
-              onChange={handleChange}
-              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="">Select a category</option>
-              <option value="Home Repair">Home Repair</option>
-              <option value="Plumbing">Plumbing</option>
-              <option value="Electrical">Electrical</option>
-              <option value="Cleaning">Cleaning</option>
-              <option value="Moving">Moving</option>
-              <option value="Yard Work">Yard Work</option>
-              <option value="Painting">Painting</option>
-              <option value="Carpentry">Carpentry</option>
-              <option value="Handyman">Handyman</option>
-              <option value="Tutoring">Tutoring</option>
-              <option value="Pet Care">Pet Care</option>
-              <option value="Babysitting">Babysitting</option>
-              <option value="Delivery">Delivery</option>
-              <option value="Tech Support">Tech Support</option>
-              <option value="Web Design">Web Design</option>
-              <option value="Graphic Design">Graphic Design</option>
-              <option value="Writing">Writing</option>
-              <option value="Photography">Photography</option>
-              <option value="Event Help">Event Help</option>
-              <option value="Auto Services">Auto Services</option>
-              <option value="Misc">Misc</option>
-            </select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="price" className="font-bold">Starting Price ($) <span className="text-destructive">*</span></Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  required
+                  min="1"
+                  value={form.price}
+                  onChange={handleChange}
+                  placeholder="25"
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Price ($) {requiredStar}
-            </label>
-            <input
-              name="price"
-              type="number"
-              required
-              min="1"
-              value={form.price}
-              onChange={handleChange}
-              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-              placeholder="25"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Tags
-            </label>
-            <input
-              name="tags"
-              value={form.tags}
-              onChange={handleChange}
-              className="w-full border border-input bg-background text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-              placeholder="design, logo, branding"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Optional. Separate tags with commas.
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? "Publishing..." : "Publish Gig"}
-          </button>
+            <div className="space-y-2">
+              <Label htmlFor="tags" className="font-bold">Keywords / Tags</Label>
+              <Input
+                id="tags"
+                name="tags"
+                value={form.tags}
+                onChange={handleChange}
+                placeholder="design, logo, branding, web"
+                className="rounded-xl"
+              />
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Separate keywords with commas.</p>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4 border-t border-border pt-6">
+            <Button type="submit" className="w-full h-12 rounded-full font-bold shadow-lg shadow-primary/20" disabled={loading}>
+              {loading ? "Publishing service..." : "Publish Gig"}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => router.back()} className="rounded-full">
+              Cancel and return
+            </Button>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
