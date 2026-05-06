@@ -207,32 +207,34 @@ function BrowseContent() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div className="min-w-0 flex-1 space-y-2">
-              <Label htmlFor="browse-search">Search</Label>
-              <Input
-                id="browse-search"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder={browseSearchPlaceholder}
-              />
-              <p className="text-xs text-muted-foreground">
-                Debounced ~350ms · Sort preference saved for this tab session.
-              </p>
+          <div className="space-y-2">
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_13rem] md:items-end">
+              <div className="min-w-0 space-y-2">
+                <Label htmlFor="browse-search">Search</Label>
+                <Input
+                  id="browse-search"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder={browseSearchPlaceholder}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="browse-sort">Sort</Label>
+                <select
+                  id="browse-sort"
+                  value={sort}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="price_asc">Price: low to high</option>
+                  <option value="price_desc">Price: high to low</option>
+                </select>
+              </div>
             </div>
-            <div className="space-y-2 md:w-52">
-              <Label htmlFor="browse-sort">Sort</Label>
-              <select
-                id="browse-sort"
-                value={sort}
-                onChange={(e) => handleSortChange(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-              >
-                <option value="newest">Newest first</option>
-                <option value="price_asc">Price: low to high</option>
-                <option value="price_desc">Price: high to low</option>
-              </select>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Debounced ~350ms · Sort preference saved for this tab session.
+            </p>
           </div>
         </header>
 
