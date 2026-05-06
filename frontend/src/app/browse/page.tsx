@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { RotateCcw, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
@@ -15,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { cn } from "@/lib/utils";
 
 const SORT_KEY = "giglink_browse_sort";
 
@@ -58,6 +60,25 @@ function BrowseContent() {
   const [gigs, setGigs] = useState<GigPublic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const hasSearch = searchInput.trim().length > 0;
+  const hasCategory = category.trim().length > 0;
+  const hasMinPrice = minPrice.trim().length > 0;
+  const hasMaxPrice = maxPrice.trim().length > 0;
+  const hasCustomSort = sort !== "newest";
+  const activeFilterCount = [
+    hasSearch,
+    hasCategory,
+    hasMinPrice,
+    hasMaxPrice,
+    hasCustomSort,
+  ].filter(Boolean).length;
+
+  const fieldClassName = (active: boolean) =>
+    cn(
+      "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+      active && "border-primary/60 bg-primary/5 shadow-sm"
+    );
 
   useEffect(() => {
     const stored = sessionStorage.getItem(SORT_KEY);
@@ -127,146 +148,234 @@ function BrowseContent() {
     sessionStorage.setItem(SORT_KEY, next);
   }
 
+  function handleResetAll() {
+    setSearchInput("");
+    setCategory("");
+    setMinPrice("");
+    setMaxPrice("");
+    setSort("newest");
+    sessionStorage.removeItem(SORT_KEY);
+  }
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-      <aside className="h-fit space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm lg:sticky lg:top-24">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Filters
-        </h2>
+    <div className="flex min-w-0 flex-col gap-6">
+      <header className="flex flex-col gap-4 border-b border-border pb-6">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+            GigLink
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Browse gigs
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+            Filters apply instantly; search waits briefly while you type so
+            requests stay smooth.
+          </p>
+        </div>
+      </header>
 
-        <div className="space-y-2">
-          <Label htmlFor="filter-category">Category</Label>
-          <select
-            id="filter-category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-border pb-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Refine results
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Search, sort, and filters update together.
+            </p>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/10"
+            onClick={handleResetAll}
+            disabled={activeFilterCount === 0}
           >
-            <option value="">All categories</option>
-            {GIG_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            <RotateCcw className="size-4" />
+            Reset all
+          </Button>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="min-price">Min price ($)</Label>
-          <Input
-            id="min-price"
-            type="number"
-            min={0}
-            step={0.01}
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="0"
-          />
-        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+          <div className="min-w-0 space-y-2 md:col-span-2 xl:col-span-3">
+            <Label htmlFor="browse-search">Search</Label>
+            <Input
+              id="browse-search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={browseSearchPlaceholder}
+              className={fieldClassName(hasSearch)}
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="max-price">Max price ($)</Label>
-          <Input
-            id="max-price"
-            type="number"
-            min={0}
-            step={0.01}
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="Any"
-          />
-        </div>
+          <div className="space-y-2 xl:col-span-1">
+            <Label htmlFor="browse-sort">Sort</Label>
+            <select
+              id="browse-sort"
+              value={sort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className={fieldClassName(hasCustomSort)}
+            >
+              <option value="newest">Newest first</option>
+              <option value="price_asc">Price: low to high</option>
+              <option value="price_desc">Price: high to low</option>
+            </select>
+          </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            setCategory("");
-            setMinPrice("");
-            setMaxPrice("");
-            setSearchInput("");
-          }}
-        >
-          Reset filters
-        </Button>
-      </aside>
-
-      <div className="flex min-w-0 flex-col gap-6">
-        <header className="flex flex-col gap-4 border-b border-border pb-6">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-              GigLink
-            </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-              Browse gigs
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Filters apply instantly; search waits briefly while you type so
-              requests stay smooth.
-            </p>
+          <div className="space-y-2 xl:col-span-2">
+            <Label htmlFor="filter-category">Category</Label>
+            <select
+              id="filter-category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={fieldClassName(hasCategory)}
+            >
+              <option value="">All categories</option>
+              {GIG_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-2">
-            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_13rem] md:items-end">
-              <div className="min-w-0 space-y-2">
-                <Label htmlFor="browse-search">Search</Label>
-                <Input
-                  id="browse-search"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder={browseSearchPlaceholder}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="browse-sort">Sort</Label>
-                <select
-                  id="browse-sort"
-                  value={sort}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            <Label htmlFor="min-price">Min price ($)</Label>
+            <Input
+              id="min-price"
+              type="number"
+              min={0}
+              step={0.01}
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="0"
+              className={fieldClassName(hasMinPrice)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="max-price">Max price ($)</Label>
+            <Input
+              id="max-price"
+              type="number"
+              min={0}
+              step={0.01}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Any"
+              className={fieldClassName(hasMaxPrice)}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {activeFilterCount > 0 ? (
+            <>
+              {hasSearch ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary hover:bg-primary/10"
+                  onClick={() => setSearchInput("")}
+                  aria-label="Clear search"
                 >
-                  <option value="newest">Newest first</option>
-                  <option value="price_asc">Price: low to high</option>
-                  <option value="price_desc">Price: high to low</option>
-                </select>
-              </div>
-            </div>
+                  <span className="text-muted-foreground">Search</span>
+                  <span className="max-w-[12rem] truncate">
+                    {searchInput.trim()}
+                  </span>
+                  <X className="size-3.5 opacity-60" />
+                </button>
+              ) : null}
+              {hasCategory ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary hover:bg-primary/10"
+                  onClick={() => setCategory("")}
+                  aria-label="Clear category"
+                >
+                  <span className="text-muted-foreground">Category</span>
+                  <span className="max-w-[12rem] truncate">{category}</span>
+                  <X className="size-3.5 opacity-60" />
+                </button>
+              ) : null}
+              {hasMinPrice ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary hover:bg-primary/10"
+                  onClick={() => setMinPrice("")}
+                  aria-label="Clear minimum price"
+                >
+                  <span className="text-muted-foreground">Min</span>
+                  <span>${minPrice.trim()}</span>
+                  <X className="size-3.5 opacity-60" />
+                </button>
+              ) : null}
+              {hasMaxPrice ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary hover:bg-primary/10"
+                  onClick={() => setMaxPrice("")}
+                  aria-label="Clear maximum price"
+                >
+                  <span className="text-muted-foreground">Max</span>
+                  <span>${maxPrice.trim()}</span>
+                  <X className="size-3.5 opacity-60" />
+                </button>
+              ) : null}
+              {hasCustomSort ? (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary hover:bg-primary/10"
+                  onClick={() => handleSortChange("newest")}
+                  aria-label="Clear sort"
+                >
+                  <span className="text-muted-foreground">Sort</span>
+                  <span>
+                    {sort === "price_asc"
+                      ? "Price: low to high"
+                      : "Price: high to low"}
+                  </span>
+                  <X className="size-3.5 opacity-60" />
+                </button>
+              ) : null}
+            </>
+          ) : (
             <p className="text-xs text-muted-foreground">
-              Debounced ~350ms · Sort preference saved for this tab session.
+              Reset all clears search, sort, category, and price filters.
             </p>
-          </div>
-        </header>
+          )}
+        </div>
+      </section>
 
-        {loading ? <BrowseSkeletonGrid /> : null}
+      {loading ? <BrowseSkeletonGrid /> : null}
 
-        {!loading && error ? (
-          <p className="text-sm text-destructive">{error}</p>
-        ) : null}
+      {!loading && error ? (
+        <p className="text-sm text-destructive">{error}</p>
+      ) : null}
 
-        {!loading && !error && gigs.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center">
-            <p className="font-medium text-foreground">No gigs match yet</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Try clearing filters or broadening your search.
-            </p>
-            <Link
-              href="/post"
-              className="mt-4 inline-flex text-sm font-medium text-primary hover:underline"
-            >
-              Post the first gig
-            </Link>
-          </div>
-        ) : null}
+      {!loading && !error && gigs.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center">
+          <p className="font-medium text-foreground">No gigs match yet</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Try clearing filters or broadening your search.
+          </p>
+          <Link
+            href="/post"
+            className="mt-4 inline-flex text-sm font-medium text-primary hover:underline"
+          >
+            Post the first gig
+          </Link>
+        </div>
+      ) : null}
 
-        {!loading && !error && gigs.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {gigs.map((gig) => (
-              <GigCard key={gig.id} gig={gig} />
-            ))}
-          </div>
-        ) : null}
-      </div>
+      {!loading && !error && gigs.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {gigs.map((gig) => (
+            <GigCard key={gig.id} gig={gig} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
