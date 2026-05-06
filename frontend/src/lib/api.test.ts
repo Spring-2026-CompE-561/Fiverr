@@ -4,7 +4,7 @@ import { apiFetch, getApiBase } from "./api";
 
 describe("getApiBase", () => {
   it("defaults when NEXT_PUBLIC_API_URL is unset", () => {
-    expect(getApiBase()).toMatch(/127\.0\.0\.1:8000$/);
+    expect(getApiBase()).toMatch(/localhost:8000$/);
   });
 });
 
@@ -49,9 +49,9 @@ describe("apiFetch", () => {
         } as Response),
       ),
     );
-    await expect(
-      apiFetch("/api/v1/x", { auth: false }),
-    ).rejects.toThrow("Invalid");
+    await expect(apiFetch("/api/v1/x", { auth: false })).rejects.toThrow(
+      "Invalid",
+    );
   });
 
   it("maps validation error array detail", async () => {
@@ -108,9 +108,7 @@ describe("apiFetch", () => {
 
   it("attaches Authorization when token in localStorage", async () => {
     vi.stubGlobal("localStorage", {
-      getItem: vi.fn((k: string) =>
-        k === "giglink_token" ? "abc" : null,
-      ),
+      getItem: vi.fn((k: string) => (k === "token" ? "abc" : null)),
     });
     const data = await apiFetch<{ a: number }>("/api/v1/orders", {
       method: "GET",

@@ -301,29 +301,38 @@ function BrowseContent() {
         </CardContent>
       </Card>
 
-      {loading ? <BrowseSkeletonGrid /> : null}
+      {loading ? (
+        <div data-testid="browse-loading">
+          <BrowseSkeletonGrid />
+        </div>
+      ) : null}
 
       {!loading && error ? (
-        <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center text-destructive font-bold">
-           {error}
+        <div
+          data-testid="browse-error"
+          className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center text-destructive font-bold"
+        >
+          {error}
         </div>
       ) : null}
 
       {!loading && !error && gigs.length === 0 ? (
-        <EmptyState
-          icon={SearchX}
-          title="No services found"
-          description="We couldn't find any services matching your current filters. Try broadening your search or adjusting the price range."
-          action={{
-            label: "Reset all filters",
-            href: "/browse",
-          }}
-          className="rounded-3xl"
-        />
+        <div data-testid="browse-empty">
+          <EmptyState
+            icon={SearchX}
+            title="No services found"
+            description="We couldn't find any services matching your current filters. Try broadening your search or adjusting the price range."
+            action={{
+              label: "Reset all filters",
+              href: "/browse",
+            }}
+            className="rounded-3xl"
+          />
+        </div>
       ) : null}
 
       {!loading && !error && gigs.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div data-testid="browse-gig-list" className="grid gap-6 sm:grid-cols-2">
           {gigs.map((gig) => (
             <GigCard key={gig.id} gig={gig} />
           ))}
@@ -337,7 +346,7 @@ export default function BrowsePage() {
   return (
     <Suspense
       fallback={
-        <div className="py-12">
+        <div className="py-12" data-testid="browse-loading">
           <BrowseSkeletonGrid />
         </div>
       }

@@ -2,7 +2,7 @@
 
 Full-stack freelance marketplace: a **Next.js** web app in `frontend/` talks to a **FastAPI** API in `backend/`. Users browse gigs, open orders, manage their seller listings, and leave reviews. Optional SMTP-backed email verification gates some actions until users confirm their address.
 
-**Documentation:** all full-stack instructions live in **this file** at the repo root. `frontend/README.md` is only a short link here; `backend/` has no readme (packaging metadata in `pyproject.toml` points to this file).
+**Documentation:** the canonical full-stack guide is **this file** at the repo root. `frontend/README.md` is a short pointer here; [`backend/README.md`](backend/README.md) summarizes backend-only commands (the `pyproject.toml` `readme` field points at this root file).
 
 ---
 
@@ -13,11 +13,12 @@ At the repository root (the directory that contains `backend/` and `frontend/`):
 ```
 .
 ├── docker-compose.yml   # Postgres + API + UI + one-shot seed
-├── backend/             # FastAPI + SQLAlchemy + JWT
+├── backend/             # FastAPI + SQLAlchemy + JWT + uv
 │   ├── src/app/         # Python package `app`
 │   ├── scripts/         # e.g. seed_marketplace.py
 │   ├── tests/
-│   ├── requirements.txt
+│   ├── uv.lock          # locked deps (install with uv)
+│   ├── requirements.txt # pip fallback (`uv export`, optional)
 │   ├── Dockerfile
 │   └── pyproject.toml
 └── frontend/            # Next.js (App Router) + React + Tailwind
@@ -33,7 +34,7 @@ At the repository root (the directory that contains `backend/` and `frontend/`):
 
 | Layer    | Requirement |
 |----------|-------------|
-| Backend  | Python **3.11+**, `pip` |
+| Backend  | Python **3.11+**, **[uv](https://docs.astral.sh/uv/getting-started/installation/)** (recommended) or `pip` + [`backend/requirements.txt`](backend/requirements.txt) |
 | Frontend | **Node.js 20+** (LTS recommended), **npm** (or `pnpm` / `yarn` if you adapt commands) |
 | Docker   | **Docker Desktop** (or Docker Engine + Compose v2). The **Docker daemon must be running** before `docker compose` (on Windows/macOS, open **Docker Desktop** and wait until the engine is ready). |
 
@@ -48,41 +49,51 @@ git clone https://github.com/Spring-2026-CompE-561/Fiverr
 cd Fiverr   # or whatever you named the clone; use the folder that contains backend/ and frontend/
 ```
 
-### 2. Backend
+### 2. PostgreSQL (local API)
+
+The app targets **PostgreSQL** only (no SQLite). The easiest way is to start the DB from the repo root:
+
+```bash
+docker compose up -d postgres
+```
+
+Wait until the container is healthy (same credentials as full compose: user/database/password `giglink`). Alternatively, use any Postgres instance and set `DATABASE_URL` accordingly.
+
+### 3. Backend
+
+From `backend/`:
 
 ```bash
 cd backend
-python -m venv .venv
 ```
 
-**Windows (PowerShell):** `.\.venv\Scripts\Activate.ps1`  
-**macOS / Linux:** `source .venv/bin/activate`
+**With uv (recommended):**
 
 ```bash
-pip install -r requirements.txt
+uv sync --all-groups
+cp .env.example .env
+# edit .env if your Postgres URL or secrets differ
+uv run uvicorn app.main:app --reload --app-dir src
 ```
 
-Create `backend/.env`:
+**With pip:** create a venv, then `pip install -r requirements.txt` and run `uvicorn app.main:app --reload --app-dir src` with `PYTHONPATH=src`.
+
+Create or edit `backend/.env` (see [`backend/.env.example`](backend/.env.example)):
 
 ```env
-DATABASE_URL=sqlite:///./giglink.db
+DATABASE_URL=postgresql+psycopg://giglink:giglink@127.0.0.1:5432/giglink
 JWT_SECRET=change-me-in-production
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
-PYTHONPATH=src
 FRONTEND_URL=http://localhost:3000
 ```
 
-Start the API (from `backend/`):
-
-```bash
-uvicorn app.main:app --reload --app-dir src
-```
+`PYTHONPATH=src` is set automatically when you use `uv run`; with plain `uvicorn` you still need it in the environment.
 
 - API: http://localhost:8000/  
 - OpenAPI: http://localhost:8000/docs  
 
-### 3. Frontend
+### 4. Frontend
 
 In a **second** terminal:
 
@@ -155,7 +166,7 @@ Sign in as the **seller** to see incoming buyer requests on **Orders**; sign in 
 ### Backend (`backend/`)
 
 - **FastAPI** — REST API, automatic OpenAPI  
-- **SQLAlchemy** — ORM (SQLite default; PostgreSQL and other SQLAlchemy URLs supported)  
+- **SQLAlchemy** — ORM (**PostgreSQL** via `psycopg`; `DATABASE_URL` must not use SQLite)  
 - **Pydantic** & **pydantic-settings** — schemas and configuration  
 - **Passlib** + **bcrypt**, **python-jose** — passwords and JWTs  
 - **python-dotenv**, **email-validator**, **httpx** — env loading, validation, tests  
@@ -165,28 +176,28 @@ Sign in as the **seller** to see incoming buyer requests on **Orders**; sign in 
 
 - **Next.js 16** (App Router), **React 19**  
 - **TypeScript**, **Tailwind CSS 4**  
-- **Vitest** + Testing Library + jsdom — unit and integration-style tests  
+- **Vitest** — unit tests and lightweight HTTP checks (`npm test`, `npm run test:coverage`, `npm run test:integration`)  
+- **Playwright** — browser E2E / integration tests (`npm run test:e2e`; install browsers once with `npx playwright install` from `frontend/`)  
 - **ESLint** (`eslint-config-next`)  
 
 ---
 
 ## Backend (detail)
 
-### Optional: PostgreSQL
+### Database
 
-Set `DATABASE_URL` to a PostgreSQL URL. `pyproject.toml` includes **`psycopg`** for that path.
+Configure **`DATABASE_URL`** for PostgreSQL (see `backend/.env.example`). Docker Compose sets this automatically for the `backend` service.
 
 ### Optional: email verification
 
-If **`SMTP_HOST`** and **`SMTP_FROM_EMAIL`** are both non-empty, new users start unverified and must confirm email before **mutating gigs**, **creating orders**, or **creating reviews**. Example:
+If **`SMTP_HOST`** is non-empty, new users start unverified and must confirm email before **mutating gigs**, **creating orders**, or **creating reviews**. Example:
 
 ```env
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASSWORD=
-SMTP_FROM_EMAIL=noreply@example.com
-SMTP_USE_TLS=true
+EMAIL_FROM=noreply@example.com
 ```
 
 Without SMTP, registrations are treated as verified immediately.
@@ -216,18 +227,26 @@ Full schemas and “try it out” are in **Swagger UI** at `/docs`.
 
 ### Backend tests
 
-From `backend/` with the venv active:
+Requires **PostgreSQL** reachable at `DATABASE_URL` (defaults match `docker compose` — run `docker compose up -d postgres` from the repo root).
+
+From `backend/`:
 
 ```bash
-pytest -v
-pytest tests/test_auth.py -v
-pytest tests/test_auth.py::test_register -v
+uv sync --all-groups
+uv run pytest -v
+uv run pytest tests/test_auth.py -v
+uv run pytest tests/test_auth.py::test_register -v
+# coverage (≥50% enforced on `src/app`)
+uv run pytest --cov=src/app --cov-report=term-missing --cov-fail-under=50
 ```
+
+Override the test DB URL if needed: `set TEST_DATABASE_URL=...` (Windows) or `export TEST_DATABASE_URL=...` (Unix).
 
 ### Backend layout notes
 
 - Application code: `backend/src/app/` (import path `app.*`).  
-- Use **`PYTHONPATH=src`** and **`uvicorn ... --app-dir src`** when running from `backend/`.  
+- Use **`uv run`** (sets up the project env) or **`PYTHONPATH=src`** plus **`uvicorn ... --app-dir src`** when running from `backend/`.  
+- The **Dockerfile** installs dependencies with **`uv sync --frozen`** (see [`backend/Dockerfile`](backend/Dockerfile)).  
 - Use a strong, unique **`JWT_SECRET`** outside local dev.
 
 ---
@@ -253,6 +272,8 @@ No trailing slash on the base URL.
 | `npm run lint` | ESLint |
 | `npm test` | Vitest (unit tests) |
 | `npm run test:integration` | Vitest tests under `src/tests/integration` (expect a **running API**; see `backend-health.integration.test.ts`) |
+| `npm run test:e2e` | **Playwright** — Chromium tests in `frontend/e2e/` (starts or reuses `npm run dev`; needs **API** at `NEXT_PUBLIC_API_URL` / `PLAYWRIGHT_API_URL`) |
+| `npm run test:e2e:ui` | Playwright UI mode |
 | `npm run test:watch` | Vitest watch mode |
 
 ### Main UI routes
@@ -288,6 +309,6 @@ API calls use the shared helper **`apiFetch`** in `frontend/src/lib/api.ts`.
 
 ## Development tips
 
-- Run **backend** and **frontend** together for full-stack work; integration tests assume the API is reachable at `NEXT_PUBLIC_API_URL`.  
+- Run **backend** and **frontend** together for full-stack work; `npm run test:integration` and `npm run test:e2e` expect the API reachable (defaults `http://127.0.0.1:8000`). For Playwright, set `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_API_URL` if you use non-default hosts.  
 - Backend optional tooling (**Ruff**, **Black**, **isort**) is declared in `backend/pyproject.toml`.  
-- For production, replace permissive CORS, rotate secrets, use a real database URL, and configure SMTP if you rely on verification.
+- For production, replace permissive CORS, rotate secrets, use a managed PostgreSQL URL, and configure SMTP if you rely on verification.
