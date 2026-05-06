@@ -10,6 +10,8 @@ import {
   LogOut,
   Menu,
   Package,
+  PlusCircle,
+  Search,
   ShoppingBag,
   UserRound,
   X,
@@ -58,10 +60,6 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handlePointerDown);
   }, []);
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
   const handleLogout = () => {
     logout();
     setUser(null);
@@ -70,51 +68,99 @@ export function Navbar() {
     router.refresh();
   };
 
-return (
-  <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-    <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-      <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
-          <Image
-            src="/logo.png"
-            alt="GigLink logo"
-            width={28}
-            height={28}
-            priority
-          />
-          <span>GigLink</span>
-        </Link>
+  const isSeller = user?.role === "seller";
+  const isBuyer = user?.role === "buyer";
 
-        <nav className="hidden items-center gap-1 md:flex md:gap-2">
-            <Link
-              href="/browse"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                pathname === "/browse" && "bg-muted"
-              )}
-            >
-              Browse
-            </Link>
-            <Link
-              href={user ? "/post" : "/login"}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                pathname === "/post" && "bg-muted"
-              )}
-            >
-              Post a gig
-            </Link>
+  return (
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2 text-xl font-black text-primary transition-transform hover:scale-[1.02] active:scale-[0.98]">
+            <Image
+              src="/logo.png"
+              alt="GigLink logo"
+              width={32}
+              height={32}
+              priority
+              className="rounded-lg shadow-sm"
+            />
+            <span className="hidden sm:inline">GigLink</span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            {!user || isBuyer ? (
+              <Link
+                href="/browse"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "rounded-full gap-2 px-4",
+                  pathname === "/browse" && "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary",
+                )}
+              >
+                <Search className="size-4" />
+                Browse
+              </Link>
+            ) : null}
+
+            {isSeller && (
+              <>
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    "rounded-full px-4",
+                    pathname === "/dashboard" && "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary",
+                  )}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/my-gigs"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    "rounded-full px-4",
+                    pathname === "/my-gigs" && "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary",
+                  )}
+                >
+                  My Gigs
+                </Link>
+              </>
+            )}
+
+            {user && (
+              <Link
+                href="/orders"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "rounded-full px-4",
+                  pathname === "/orders" && "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary",
+                )}
+              >
+                Orders
+              </Link>
+            )}
           </nav>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          {isSeller && (
+            <Link
+              href="/post"
+              className={cn(
+                buttonVariants({ size: "sm" }),
+                "hidden h-9 gap-2 px-5 rounded-full shadow-lg shadow-primary/20 lg:inline-flex",
+              )}
+            >
+              <PlusCircle className="size-4" />
+              Post a gig
+            </Link>
+          )}
+
           <ThemeToggle />
 
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
             aria-expanded={mobileOpen}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             onClick={() => setMobileOpen((v) => !v)}
@@ -127,75 +173,78 @@ return (
           </button>
 
           {user === undefined ? (
-            <span className="hidden px-2 text-sm text-muted-foreground sm:inline">
-              …
-            </span>
+            <div className="size-9 animate-pulse rounded-full bg-muted" />
           ) : user ? (
             <div className="relative hidden items-center gap-2 sm:flex" ref={accountRef}>
-              <span className="hidden rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground xl:inline">
-                {user.role}
-              </span>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-9 gap-2 border-border pl-1 pr-2"
+                className="h-9 gap-2 rounded-full border-border/60 pl-1 pr-3 transition-all hover:border-primary/40 hover:bg-primary/5"
                 aria-expanded={accountOpen}
                 aria-haspopup="menu"
+                aria-label="Open account menu"
                 onClick={() => setAccountOpen((v) => !v)}
               >
-                <UserAvatar name={user.name} avatarUrl={user.avatar_url} size="sm" />
-                <span className="max-w-[120px] truncate text-xs font-medium">
-                  {user.name}
-                </span>
-                <ChevronDown className="size-4 shrink-0 opacity-60" />
+                <UserAvatar name={user.name} avatarUrl={user.avatar_url} size="sm" className="ring-1 ring-border/50" />
+                <span className="max-w-[80px] truncate text-xs font-bold">{user.name.split(' ')[0]}</span>
+                <ChevronDown className={cn("size-3.5 shrink-0 opacity-40 transition-transform duration-200", accountOpen && "rotate-180")} />
               </Button>
 
               {accountOpen ? (
                 <div
                   role="menu"
-                  className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-[220px] rounded-xl border border-border bg-popover p-1 shadow-lg"
+                  className="absolute left-auto right-0 top-[calc(100%+8px)] z-50 min-w-[240px] origin-top-right overflow-hidden rounded-2xl border border-border/60 bg-popover p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-200"
                 >
-                  <Link
-                    href="/dashboard"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <LayoutDashboard className="size-4 opacity-70" />
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/my-gigs"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <ShoppingBag className="size-4 opacity-70" />
-                    My gigs
-                  </Link>
-                  <Link
-                    href="/orders"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <Package className="size-4 opacity-70" />
-                    Orders
-                  </Link>
-                  <Link
-                    href="/profile"
-                    role="menuitem"
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                    onClick={() => setAccountOpen(false)}
-                  >
-                    <UserRound className="size-4 opacity-70" />
-                    Profile
-                  </Link>
+                  <div className="px-3 py-3 mb-1 bg-muted/30 rounded-xl">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                      Signed in as
+                    </p>
+                    <p className="truncate text-sm font-bold text-foreground">{user.email}</p>
+                  </div>
+                  
+                  <div className="space-y-0.5">
+                    {isBuyer && (
+                      <Link
+                        href="/dashboard"
+                        role="menuitem"
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <LayoutDashboard className="size-4 opacity-70" />
+                        Dashboard
+                      </Link>
+                    )}
+
+                    {isSeller && (
+                      <Link
+                        href="/browse"
+                        role="menuitem"
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <Search className="size-4 opacity-70" />
+                        Browse Marketplace
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/profile"
+                      role="menuitem"
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-primary/5 hover:text-primary"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      <UserRound className="size-4 opacity-70" />
+                      Profile Settings
+                    </Link>
+                  </div>
+
+                  <div className="my-1.5 h-px bg-border/40" />
+                  
                   <button
                     type="button"
                     role="menuitem"
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-bold text-destructive transition-colors hover:bg-destructive/10"
                     onClick={handleLogout}
                   >
                     <LogOut className="size-4" />
@@ -208,13 +257,12 @@ return (
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "outline", size: "sm" }),
-                "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10")}
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-full px-4")}
               >
-                Login
+                Sign In
               </Link>
-              <Link href="/signup" className={cn(buttonVariants({ size: "sm" }))}>
-                Sign Up
+              <Link href="/signup" className={cn(buttonVariants({ size: "sm" }), "rounded-full px-5 shadow-lg shadow-primary/20")}>
+                Get Started
               </Link>
             </div>
           )}
@@ -222,84 +270,145 @@ return (
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-border bg-card px-4 py-4 md:hidden">
-          <nav className="flex flex-col gap-1">
-            <Link
-              href="/browse"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-              onClick={() => setMobileOpen(false)}
-            >
-              Browse marketplace
-            </Link>
-            <Link
-              href={user ? "/post" : "/login"}
-              className={cn(buttonVariants({ size: "sm" }), "justify-center")}
-              onClick={() => setMobileOpen(false)}
-            >
-              Post a gig
-            </Link>
+        <div className="border-t border-border bg-background px-4 py-6 md:hidden animate-in slide-in-from-top-4 duration-300">
+          <nav className="flex flex-col gap-1.5">
+            {(!user || isBuyer) && (
+              <Link
+                href="/browse"
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                  pathname === "/browse" && "bg-primary/10 text-primary",
+                )}
+                onClick={() => setMobileOpen(false)}
+              >
+                <Search className="size-5 opacity-70" />
+                Browse marketplace
+              </Link>
+            )}
 
-            {user ? (
+            {isSeller && (
               <>
-                <p className="mt-3 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Account ({user.role})
-                </p>
                 <Link
                   href="/dashboard"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                    pathname === "/dashboard" && "bg-primary/10 text-primary",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <LayoutDashboard className="size-5 opacity-70" />
                   Dashboard
                 </Link>
                 <Link
                   href="/my-gigs"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                    pathname === "/my-gigs" && "bg-primary/10 text-primary",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <ShoppingBag className="size-5 opacity-70" />
                   My gigs
                 </Link>
                 <Link
-                  href="/orders"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  href="/post"
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "mt-4 justify-center gap-2 rounded-xl shadow-lg shadow-primary/20",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <PlusCircle className="size-5" />
+                  Post a gig
+                </Link>
+              </>
+            )}
+
+            {user ? (
+              <>
+                <Link
+                  href="/orders"
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                    pathname === "/orders" && "bg-primary/10 text-primary",
+                  )}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Package className="size-5 opacity-70" />
                   Orders
                 </Link>
+                
+                <div className="my-4 h-px bg-border/40" />
+
                 <Link
                   href="/profile"
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-muted"
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                    pathname === "/profile" && "bg-muted",
+                  )}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Profile
+                  <UserRound className="size-5 opacity-70" />
+                  Profile settings
                 </Link>
+
+                {isSeller && (
+                   <Link
+                   href="/browse"
+                   className={cn(
+                     "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                     pathname === "/browse" && "bg-muted",
+                   )}
+                   onClick={() => setMobileOpen(false)}
+                 >
+                   <Search className="size-5 opacity-70" />
+                   Browse Marketplace
+                 </Link>
+                )}
+                
+                {isBuyer && (
+                   <Link
+                   href="/dashboard"
+                   className={cn(
+                     "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors hover:bg-primary/5 hover:text-primary",
+                     pathname === "/dashboard" && "bg-muted",
+                   )}
+                   onClick={() => setMobileOpen(false)}
+                 >
+                   <LayoutDashboard className="size-5 opacity-70" />
+                   Dashboard
+                 </Link>
+                )}
+
                 <button
                   type="button"
-                  className="rounded-lg px-3 py-2.5 text-left text-sm text-destructive hover:bg-destructive/10"
+                  className="mt-2 flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-black text-destructive transition-colors hover:bg-destructive/10"
                   onClick={() => {
                     handleLogout();
                     setMobileOpen(false);
                   }}
                 >
+                  <LogOut className="size-5" />
                   Log out
                 </button>
               </>
             ) : (
-              <>
+              <div className="mt-4 flex flex-col gap-3">
                 <Link
                   href="/login"
-                  className="mt-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
+                  className={cn(buttonVariants({ variant: "outline", size: "lg" }), "rounded-xl font-bold")}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Login
+                  Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className={cn(buttonVariants({ className: "mt-1 justify-center" }))}
+                  className={cn(buttonVariants({ size: "lg" }), "rounded-xl font-bold shadow-lg shadow-primary/20")}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Sign Up
+                  Get Started
                 </Link>
-              </>
+              </div>
             )}
           </nav>
         </div>

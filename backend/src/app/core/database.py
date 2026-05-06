@@ -1,12 +1,17 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
 from .settings import settings
 
-engine = create_engine(                        # engine connects python to database
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False}  # only needed for SQLite
+# SQLite needs check_same_thread=False; Postgres/other drivers must not receive it.
+_connect_args = (
+    {"check_same_thread": False}
+    if settings.DATABASE_URL.startswith("sqlite")
+    else {}
 )
+
+engine = create_engine(settings.DATABASE_URL, connect_args=_connect_args)
 
 
 # creates sessions to run queries

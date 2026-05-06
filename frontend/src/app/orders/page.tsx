@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Clock, ExternalLink, Package, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
 import { apiFetch } from "@/lib/api";
@@ -9,9 +10,11 @@ import { useSession } from "@/hooks/use-session";
 import { formatDateTime, formatRelativeTime } from "@/lib/format";
 import type { OrderPublic } from "@/lib/types";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/empty-state";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 function normalizeRole(role: string | undefined): "buyer" | "seller" | null {
   if (!role) return null;
@@ -23,28 +26,28 @@ function normalizeRole(role: string | undefined): "buyer" | "seller" | null {
 function statusChipClass(status: OrderPublic["status"]) {
   switch (status) {
     case "pending":
-      return "border-amber-500/35 bg-amber-500/15 text-amber-900 dark:text-amber-200";
+      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
     case "accepted":
-      return "border-sky-500/35 bg-sky-500/15 text-sky-900 dark:text-sky-200";
+      return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400";
     case "rejected":
-      return "border-destructive/35 bg-destructive/15 text-destructive";
+      return "bg-destructive/10 text-destructive";
     case "completed":
-      return "border-emerald-500/35 bg-emerald-500/15 text-emerald-900 dark:text-emerald-200";
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
     default:
-      return "border-border bg-muted text-muted-foreground";
+      return "bg-muted text-muted-foreground";
   }
 }
 
 function buyerStatusLabel(status: OrderPublic["status"]): string {
   switch (status) {
     case "pending":
-      return "Pending — waiting for the seller";
+      return "Waiting for seller response";
     case "accepted":
-      return "Accepted — seller is working on it";
+      return "Seller is currently working on it";
     case "rejected":
-      return "Rejected — seller declined this request";
+      return "Seller declined this request";
     case "completed":
-      return "Completed — order is closed";
+      return "Service has been delivered";
     default:
       return status;
   }
@@ -111,9 +114,13 @@ export default function OrdersPage() {
 
   if (loading || !user) {
     return (
-      <div className="space-y-4 py-6">
+      <div className="space-y-6 py-6">
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-24 w-full max-w-xl" />
+        <div className="space-y-4 pt-4">
+          <Skeleton className="h-40 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -121,7 +128,7 @@ export default function OrdersPage() {
   const accountRole = normalizeRole(user.role);
 
   return (
-    <main className="flex flex-col gap-8">
+    <main className="flex flex-col gap-10">
       <ConfirmDialog
         open={confirm?.type === "cancel"}
         title="Cancel this request?"
@@ -151,174 +158,185 @@ export default function OrdersPage() {
         }}
       />
 
-      <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-          Orders
+      <header className="space-y-2">
+        <p className="text-sm font-bold uppercase tracking-widest text-primary/80">
+          Transactions
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">
-          Your orders
+        <h1 className="text-4xl font-extrabold tracking-tight">
+          Manage Orders
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="max-w-2xl text-muted-foreground">
           {accountRole === "buyer"
-            ? "See each gig you requested and whether it is pending, accepted, or rejected."
+            ? "Track your requests and follow up on the status of your services."
             : accountRole === "seller"
-              ? "Incoming buyer requests for your gigs include their name and when each request arrived."
-              : "Track purchases or sales."}
+              ? "Review and fulfill incoming requests from buyers who want to hire you."
+              : "Monitor your purchases and sales on GigLink."}
         </p>
       </header>
 
       {listLoading ? (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 w-full rounded-xl" />
+            <Skeleton key={i} className="h-40 w-full rounded-2xl" />
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-14 text-center">
+        <div className="pt-4">
           {accountRole === "seller" ? (
-            <>
-              <p className="font-medium">No buyer requests yet</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                This page lists orders buyers place on your gigs. Create a gig,
-                then have a buyer submit{" "}
-                <code className="rounded bg-muted px-1">POST /api/v1/orders</code>{" "}
-                with your gig ID.
-              </p>
-            </>
+            <EmptyState
+              icon={Package}
+              title="No buyer requests yet"
+              description="When buyers purchase your gigs, their requests will appear here for you to manage and fulfill."
+            />
           ) : (
-            <>
-              <p className="font-medium">Nothing here yet</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                When you request a gig as a buyer, it will appear here with
-                status and the time you sent it.
-              </p>
-              <Link
-                href="/browse"
-                className="mt-4 inline-flex text-sm font-medium text-primary hover:underline"
-              >
-                Browse gigs
-              </Link>
-            </>
+            <EmptyState
+              icon={ShoppingCart}
+              title="You haven't ordered anything"
+              description="Find the perfect service for your next project and track your orders right here."
+              action={{
+                label: "Browse Marketplace",
+                href: "/browse",
+              }}
+            />
           )}
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid gap-6">
           {orders.map((o) => (
-            <li
-              key={o.id}
-              className="rounded-xl border border-border bg-card p-5 shadow-sm"
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 flex-1 space-y-2">
-                  <p className="text-xs font-mono text-muted-foreground">
-                    Order {o.id.slice(0, 8)}… ·{" "}
-                    {accountRole === "seller" ? "Received" : "Sent"}{" "}
-                    <span className="font-sans text-foreground">
-                      {formatDateTime(o.created_at)}
+            <li key={o.id}>
+              <Card className="border-border/60 overflow-hidden transition-all hover:border-primary/20 hover:shadow-md">
+                <CardHeader className="bg-muted/30 pb-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs font-bold font-mono tracking-tighter text-muted-foreground uppercase">
+                           Order #{o.id.slice(0, 8)}
+                         </span>
+                         <span className="text-muted-foreground/30 px-1">•</span>
+                         <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                            <Clock className="size-3" />
+                            {formatDateTime(o.created_at)}
+                         </span>
+                      </div>
+                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                        {o.gig_title}
+                      </CardTitle>
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-transparent",
+                        statusChipClass(o.status),
+                      )}
+                    >
+                      {o.status}
                     </span>
-                  </p>
+                  </div>
+                </CardHeader>
 
-                  <h2 className="text-lg font-semibold leading-tight">
-                    {o.gig_title}
-                  </h2>
+                <CardContent className="pt-6">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div className="space-y-4">
+                       <div>
+                          <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Request Details</p>
+                          <div className="rounded-xl border border-border bg-muted/20 p-4">
+                            <p className="text-sm leading-relaxed text-foreground italic">
+                              &ldquo;{o.message}&rdquo;
+                            </p>
+                          </div>
+                       </div>
+                    </div>
 
-                  {accountRole === "buyer" ? (
-                    <>
-                      <p className="text-sm font-medium text-foreground">
-                        Your request:{" "}
-                        <span className="capitalize">{o.status}</span>
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {buyerStatusLabel(o.status)}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm">
-                      <span className="text-muted-foreground">Buyer:</span>{" "}
-                      <span className="font-semibold text-foreground">
-                        {o.buyer_name}
-                      </span>
-                    </p>
+                    <div className="space-y-4">
+                       <div className="flex flex-col gap-4 rounded-xl border border-border bg-muted/5 p-4">
+                          {accountRole === "buyer" ? (
+                            <div className="space-y-1">
+                               <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Seller Response Status</p>
+                               <p className="text-sm font-bold text-foreground">
+                                 {buyerStatusLabel(o.status)}
+                               </p>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-3">
+                               <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-black text-primary">
+                                  {o.buyer_name?.[0].toUpperCase()}
+                               </div>
+                               <div className="space-y-0.5">
+                                  <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Buyer Identity</p>
+                                  <p className="text-sm font-bold text-foreground">{o.buyer_name}</p>
+                               </div>
+                            </div>
+                          )}
+                          <div className="pt-2 border-t border-border/50">
+                             <p className="text-[10px] font-medium text-muted-foreground">
+                               Last activity {formatRelativeTime(o.updated_at)}
+                             </p>
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="bg-muted/10 border-t border-border/40 py-4 flex flex-wrap gap-3">
+                  {accountRole === "seller" && o.status === "pending" && (
+                    <div className="flex flex-wrap gap-2 mr-auto">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="rounded-full px-6"
+                        onClick={() => void updateStatus(o.id, "accepted")}
+                      >
+                        Accept Request
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="rounded-full"
+                        onClick={() =>
+                          setConfirm({ type: "reject", orderId: o.id })
+                        }
+                      >
+                        Reject
+                      </Button>
+                    </div>
                   )}
 
-                  <p className="text-xs text-muted-foreground">
-                    Last updated {formatRelativeTime(o.updated_at)}
-                  </p>
-                </div>
-
-                <span
-                  className={cn(
-                    "inline-flex h-fit shrink-0 rounded-full border px-3 py-1 text-xs font-semibold capitalize",
-                    statusChipClass(o.status),
+                  {accountRole === "seller" && o.status === "accepted" && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="rounded-full mr-auto"
+                      onClick={() => void updateStatus(o.id, "completed")}
+                    >
+                      Mark as Completed
+                    </Button>
                   )}
-                >
-                  {o.status}
-                </span>
-              </div>
 
-              <div className="mt-4 rounded-lg border border-border/80 bg-muted/20 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Message
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-foreground">
-                  {o.message}
-                </p>
-              </div>
+                  <div className="flex gap-2 ml-auto">
+                    <Link
+                      href={`/gigs/${o.gig_id}`}
+                      className={cn(buttonVariants({ variant: "outline", size: "sm" }), "rounded-full gap-2")}
+                    >
+                      View Gig
+                      <ExternalLink className="size-3" />
+                    </Link>
 
-              {accountRole === "seller" && o.status === "pending" ? (
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => void updateStatus(o.id, "accepted")}
-                  >
-                    Accept
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() =>
-                      setConfirm({ type: "reject", orderId: o.id })
-                    }
-                  >
-                    Reject
-                  </Button>
-                </div>
-              ) : null}
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Link
-                  href={`/gigs/${o.gig_id}`}
-                  className="inline-flex items-center text-sm font-medium text-primary hover:underline"
-                >
-                  View gig
-                </Link>
-
-                {accountRole === "buyer" && o.status === "pending" ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      setConfirm({ type: "cancel", orderId: o.id })
-                    }
-                  >
-                    Cancel request
-                  </Button>
-                ) : null}
-
-                {accountRole === "seller" && o.status === "accepted" ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => void updateStatus(o.id, "completed")}
-                  >
-                    Mark complete
-                  </Button>
-                ) : null}
-              </div>
+                    {accountRole === "buyer" && o.status === "pending" && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full text-destructive hover:bg-destructive/5 hover:text-destructive"
+                        onClick={() =>
+                          setConfirm({ type: "cancel", orderId: o.id })
+                        }
+                      >
+                        Cancel Request
+                      </Button>
+                    )}
+                  </div>
+                </CardFooter>
+              </Card>
             </li>
           ))}
         </ul>

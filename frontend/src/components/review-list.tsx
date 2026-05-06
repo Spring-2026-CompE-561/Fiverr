@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MessageSquare, MessageSquareOff, Star } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
 import { formatRelativeTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Review = {
   id: string;
@@ -66,52 +70,88 @@ export default function ReviewList({ type, targetId }: ReviewListProps) {
   }, [type, targetId]);
 
   return (
-    <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">Gig Reviews</h2>
-
-      {loading ? (
-        <div className="mt-4 space-y-3">
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
+    <Card className="h-fit">
+      <CardHeader>
+        <div className="flex items-center gap-2 text-primary mb-1">
+          <MessageSquare className="size-4" />
+          <span className="text-xs font-bold uppercase tracking-widest">Community feedback</span>
         </div>
-      ) : null}
+        <CardTitle className="text-xl font-bold tracking-tight">Gig Reviews</CardTitle>
+        <CardDescription>
+          See what other buyers have to say about this service.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {loading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+            ))}
+          </div>
+        ) : null}
 
-      {!loading && error ? (
-        <p className="mt-4 text-sm text-destructive">{error}</p>
-      ) : null}
+        {!loading && error ? (
+          <div className="rounded-xl bg-destructive/10 p-4 text-sm font-medium text-destructive border border-destructive/20 text-center">
+            {error}
+          </div>
+        ) : null}
 
-      {!loading && !error && reviews.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          No reviews yet — be the first to share feedback.
-        </p>
-      ) : null}
+        {!loading && !error && reviews.length === 0 ? (
+          <EmptyState
+            icon={MessageSquareOff}
+            title="No reviews yet"
+            description="Be the first to share your experience with this service."
+            className="min-h-[250px] border-none bg-muted/20"
+          />
+        ) : null}
 
-      <div className="mt-4 space-y-4">
-        {reviews.map((review) => {
-          const created = review.created_at || review.createdAt;
-          return (
-            <div
-              key={review.id}
-              className="rounded-lg border border-border bg-background p-4"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <p className="font-semibold">Rating: {review.rating}/5</p>
-                <p className="text-xs text-muted-foreground">
-                  {formatRelativeTime(created) || "No date"}
-                </p>
+        <div className="space-y-4">
+          {reviews.map((review) => {
+            const created = review.created_at || review.createdAt;
+            return (
+              <div
+                key={review.id}
+                className="group/review rounded-2xl border border-border bg-muted/10 p-5 transition-all hover:bg-muted/20 hover:border-primary/20"
+              >
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <div className="flex items-center gap-1.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={cn(
+                          "size-3.5",
+                          i < review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"
+                        )} 
+                      />
+                    ))}
+                    <span className="ml-2 text-sm font-bold">{review.rating}/5</span>
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {created ? formatRelativeTime(created) : "Recently"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="size-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                    B
+                  </div>
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    Buyer ID: <span className="text-foreground">{(review.buyer_id || review.buyerId || "Anonymous").slice(0, 8)}...</span>
+                  </span>
+                </div>
+
+                {review.comment ? (
+                  <p className="text-sm leading-relaxed text-foreground/80 italic">
+                    &ldquo;{review.comment}&rdquo;
+                  </p>
+                ) : (
+                  <p className="text-sm italic text-muted-foreground/60">No comment left.</p>
+                )}
               </div>
-
-              <p className="mt-2 text-sm text-muted-foreground">
-                Buyer: {review.buyer_id || review.buyerId || "Unknown"}
-              </p>
-
-              {review.comment ? (
-                <p className="mt-3 text-sm">{review.comment}</p>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-    </section>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

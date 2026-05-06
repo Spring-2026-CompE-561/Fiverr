@@ -2,17 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { validateSession } from "@/lib/auth";
+import { validateSession, type UserPublic } from "@/lib/auth";
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserPublic | null>(null);
 
   useEffect(() => {
-    const syncAuthState = async () => {
-      const user = await validateSession();
-      setIsLoggedIn(Boolean(user));
-    };
-    void syncAuthState();
+    void validateSession().then(setUser);
   }, []);
 
   return (
@@ -38,17 +34,19 @@ export default function Home() {
           >
             Browse Gigs
           </Link>
-          <Link
-            href={isLoggedIn ? "/post" : "/login"}
-            className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-6 text-sm font-medium text-card-foreground transition hover:bg-accent hover:text-accent-foreground"
-          >
-            Post a Gig
-          </Link>
+          {user?.role !== "buyer" && (
+            <Link
+              href={user ? "/post" : "/login"}
+              className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-6 text-sm font-medium text-card-foreground transition hover:bg-accent hover:text-accent-foreground"
+            >
+              Post a Gig
+            </Link>
+          )}
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Fast Search
           </h2>
@@ -58,7 +56,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Clear Listings
           </h2>
@@ -67,7 +65,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-md">
           <h2 className="text-lg font-semibold text-card-foreground">
             Efficient Flow
           </h2>
@@ -90,7 +88,7 @@ export default function Home() {
           </div>
 
           <Link
-            href={isLoggedIn ? "/dashboard" : "/login"}
+            href={user ? "/dashboard" : "/login"}
             className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:opacity-90"
           >
             Go to Dashboard
