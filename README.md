@@ -35,7 +35,7 @@ At the repository root (the directory that contains `backend/` and `frontend/`):
 |----------|-------------|
 | Backend  | Python **3.11+**, `pip` |
 | Frontend | **Node.js 20+** (LTS recommended), **npm** (or `pnpm` / `yarn` if you adapt commands) |
-| Docker   | **Docker Desktop** (or Docker Engine + Compose v2) |
+| Docker   | **Docker Desktop** (or Docker Engine + Compose v2). The **Docker daemon must be running** before `docker compose` (on Windows/macOS, open **Docker Desktop** and wait until the engine is ready). |
 
 ---
 
@@ -101,6 +101,8 @@ The UI reads **`NEXT_PUBLIC_API_URL`** (see [`frontend/.env.example`](frontend/.
 ---
 
 ## Docker (Postgres + API + UI + demo data)
+
+**Docker Desktop must be running** (Windows/macOS) or your Docker engine must be up, or `docker compose` cannot pull images or start containers.
 
 From the repo root (folder that contains `docker-compose.yml`):
 
