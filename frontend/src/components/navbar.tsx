@@ -58,10 +58,6 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handlePointerDown);
   }, []);
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
   const handleLogout = () => {
     logout();
     setUser(null);
@@ -85,13 +81,13 @@ export function Navbar() {
             <span>GigLink</span>
           </Link>
 
-        <nav className="hidden items-center gap-1 md:flex md:gap-2">
+          <nav className="hidden items-center gap-1 md:flex md:gap-2">
             <Link
               href="/browse"
               className={cn(
                 buttonVariants({ variant: "outline", size: "sm" }),
                 "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
-                pathname === "/browse" && "bg-muted"
+                pathname === "/browse" && "bg-primary/10 border-primary",
               )}
             >
               Browse
@@ -104,6 +100,41 @@ export function Navbar() {
                 Post a gig
               </Link>
             )}
+            {user?.role === "seller" ? (
+              <Link
+                href="/my-gigs"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  pathname === "/my-gigs" && "bg-muted",
+                )}
+              >
+                My gigs
+              </Link>
+            ) : null}
+            {user ? (
+              <>
+                <Link
+                  href="/orders"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
+                    pathname === "/orders" && "bg-primary/10 border-primary",
+                  )}
+                >
+                  Orders
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "border-primary/60 bg-background text-foreground hover:border-primary hover:bg-primary/10",
+                    pathname === "/dashboard" && "bg-primary/10 border-primary",
+                  )}
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : null}
           </nav>
         </div>
 
@@ -130,9 +161,6 @@ export function Navbar() {
             </span>
           ) : user ? (
             <div className="relative hidden items-center gap-2 sm:flex" ref={accountRef}>
-              <span className="hidden rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground xl:inline">
-                {user.role}
-              </span>
               <Button
                 type="button"
                 variant="outline"
