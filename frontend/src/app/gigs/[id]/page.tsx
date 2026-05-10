@@ -67,7 +67,7 @@ export default function GigDetailPage() {
     };
   }, [id]);
 
-  async function requestOrder(e: React.FormEvent) {
+  async function requestOrder(e: React.SyntheticEvent) {
     e.preventDefault();
     setOrderLoading(true);
     try {

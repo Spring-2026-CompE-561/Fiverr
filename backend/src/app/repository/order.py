@@ -20,7 +20,10 @@ def create_order(db: Session, gig_id: str, buyer_id: str, message: str) -> Order
 def get_order_by_id(db: Session, order_id: str) -> Order | None:
     return (
         db.query(Order)
-        .options(joinedload(Order.buyer), joinedload(Order.gig))
+        .options(
+            joinedload(Order.buyer),
+            joinedload(Order.gig).joinedload(Gig.seller),
+        )
         .filter(Order.id == order_id)
         .first()
     )

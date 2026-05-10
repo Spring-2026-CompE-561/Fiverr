@@ -6,13 +6,19 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
+from app.core.email_utils import normalize_email
 from app.models.user import User
 from app.schemas.user import UserRegister, UserUpdate
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
-    """Return a user by email, or None if not found."""
-    return db.query(User).filter(User.email == email).first()
+    """Exact case-insensitive lookup. Used for login."""
+    return db.query(User).filter(User.email == email.lower()).first()
+
+
+def get_user_by_normalized_email(db: Session, email: str) -> User | None:
+    """Normalizes dots out of Gmail addresses before lookup. Used for registration duplicate check."""
+    return db.query(User).filter(User.email == normalize_email(email)).first()
 
 
 def get_user_by_id(db: Session, user_id: str) -> User | None:
@@ -36,7 +42,7 @@ def create_user(
     """Create and persist a new user."""
     db_user = User(
         name=user_data.name,
-        email=user_data.email,
+        email=normalize_email(user_data.email),
         password_hash=password_hash,
         role=user_data.role,
         email_verified=email_verified,

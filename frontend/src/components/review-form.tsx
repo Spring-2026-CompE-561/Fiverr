@@ -20,7 +20,7 @@ export default function ReviewForm({ type, targetId }: ReviewFormProps) {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     setLoading(true);
 

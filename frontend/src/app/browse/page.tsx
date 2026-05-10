@@ -177,55 +177,54 @@ function BrowseContent() {
 
       <Card className="border-border/60 shadow-md">
         <CardContent className="p-6">
-           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div className="flex-1 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                 <div className="space-y-2 lg:col-span-2">
-                    <Label htmlFor="browse-search" className="font-bold flex items-center gap-2">
-                       <Search className="size-3.5" />
-                       Search
-                    </Label>
-                    <Input
-                      id="browse-search"
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      placeholder={browseSearchPlaceholder}
-                      className={fieldClassName(hasSearch)}
-                    />
-                 </div>
-
-                 <div className="space-y-2">
-                    <Label htmlFor="browse-sort" className="font-bold">Sort By</Label>
-                    <select
-                      id="browse-sort"
-                      value={sort}
-                      onChange={(e) => handleSortChange(e.target.value)}
-                      className={fieldClassName(hasCustomSort)}
-                    >
-                      <option value="newest">Newest first</option>
-                      <option value="price_asc">Price: low to high</option>
-                      <option value="price_desc">Price: high to low</option>
-                    </select>
-                 </div>
-
-                 <div className="space-y-2">
-                    <Label htmlFor="filter-category" className="font-bold">Category</Label>
-                    <select
-                      id="filter-category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className={fieldClassName(hasCategory)}
-                    >
-                      <option value="">All categories</option>
-                      {GIG_CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                 </div>
+           <div className="flex flex-col gap-3 md:flex-row md:items-end">
+              <div className="space-y-2 flex-1">
+                 <Label htmlFor="browse-search" className="font-bold flex items-center gap-2 pl-2">
+                    <Search className="size-3.5" />
+                    Search
+                 </Label>
+                 <Input
+                   id="browse-search"
+                   value={searchInput}
+                   onChange={(e) => setSearchInput(e.target.value)}
+                   placeholder={browseSearchPlaceholder}
+                   className={fieldClassName(hasSearch)}
+                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="space-y-2 w-full md:w-44">
+                 <Label htmlFor="browse-sort" className="font-bold pl-2">Sort By</Label>
+                 <select
+                   id="browse-sort"
+                   value={sort}
+                   onChange={(e) => handleSortChange(e.target.value)}
+                   className={fieldClassName(hasCustomSort)}
+                 >
+                   <option value="newest">Newest first</option>
+                   <option value="price_asc">Price: low to high</option>
+                   <option value="price_desc">Price: high to low</option>
+                 </select>
+              </div>
+
+              <div className="space-y-2 w-full md:w-44">
+                 <Label htmlFor="filter-category" className="font-bold pl-2">Category</Label>
+                 <select
+                   id="filter-category"
+                   value={category}
+                   onChange={(e) => setCategory(e.target.value)}
+                   className={fieldClassName(hasCategory)}
+                 >
+                   <option value="">All categories</option>
+                   {GIG_CATEGORIES.map((c) => (
+                     <option key={c} value={c}>
+                       {c}
+                     </option>
+                   ))}
+                 </select>
+              </div>
+
+              <div className="space-y-2">
+                 <Label className="invisible select-none" aria-hidden="true">_</Label>
                  <Button
                     type="button"
                     variant="outline"

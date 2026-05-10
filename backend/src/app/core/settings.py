@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     )
     JWT_SECRET: str = "dev-secret"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
 
     # SMTP — leave SMTP_HOST empty to disable real email and log links instead
     SMTP_HOST: str = ""

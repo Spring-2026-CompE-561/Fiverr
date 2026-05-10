@@ -17,6 +17,7 @@ from app.repository.order import (
 )
 
 from app.schemas.order import OrderCreate
+from app.services.email_delivery import send_new_order_email, send_order_accepted_email
 
 
 def create_order_service(
@@ -46,6 +47,16 @@ def create_order_service(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Order created but could not be loaded",
         )
+
+    seller = reloaded.gig.seller
+    send_new_order_email(
+        to_email=seller.email,
+        seller_name=seller.name,
+        buyer_name=current_user.name,
+        gig_title=reloaded.gig.title,
+        message=reloaded.message,
+    )
+
     return reloaded
 
 
@@ -118,7 +129,17 @@ def update_order_service(
             detail="Invalid order status",
         )
 
-    return update_order_status(db, order, new_status)
+    updated = update_order_status(db, order, new_status)
+
+    if new_status == "accepted":
+        send_order_accepted_email(
+            to_email=order.buyer.email,
+            buyer_name=order.buyer.name,
+            seller_name=current_user.name,
+            gig_title=order.gig.title,
+        )
+
+    return updated
 
 
 def cancel_order_service(

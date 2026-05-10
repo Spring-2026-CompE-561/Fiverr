@@ -14,6 +14,7 @@ from app.core.settings import settings
 from app.repository.user import (
     create_user,
     get_user_by_email,
+    get_user_by_normalized_email,
     get_user_by_verification_token,
 )
 from app.schemas.user import AuthResponse, UserLogin, UserRegister
@@ -29,7 +30,7 @@ class VerifyEmailRequest(BaseModel):
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED, summary="Register a new user")
 def register(user_data: UserRegister, db: Session = Depends(get_db)) -> AuthResponse:
     """Register a new buyer or seller and return a JWT."""
-    existing_user = get_user_by_email(db, user_data.email)
+    existing_user = get_user_by_normalized_email(db, user_data.email)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
