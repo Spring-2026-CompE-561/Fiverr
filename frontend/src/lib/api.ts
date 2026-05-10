@@ -1,4 +1,4 @@
-import { getToken } from "@/lib/auth";
+import { getToken, logout } from "@/lib/auth";
 
 export function getApiBase(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -49,6 +49,17 @@ export async function apiFetch<T = unknown>(
   });
 
   if (!res.ok) {
+    // A 401 from an authenticated request means the token is no longer valid.
+    if (auth !== false && res.status === 401) {
+      logout();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth:logout"));
+        if (window.location.pathname !== "/login") {
+          window.location.replace("/login");
+        }
+      }
+    }
+
     const text = await res.text();
     let parsed: Record<string, unknown> = {};
     try {

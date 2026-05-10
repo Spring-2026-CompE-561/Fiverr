@@ -118,4 +118,46 @@ describe("apiFetch", () => {
     const h = new Headers(init.headers);
     expect(h.get("Authorization")).toBe("Bearer abc");
   });
+
+  it("logs out and redirects on authenticated 401", async () => {
+    const removeItem = vi.fn();
+    vi.stubGlobal("localStorage", {
+      getItem: vi.fn((k: string) => {
+        if (k === "token") return "stale-token";
+        if (k === "user") return JSON.stringify({ id: "u1" });
+        return null;
+      }),
+      removeItem,
+    });
+
+    const replace = vi.fn();
+    const dispatchEvent = vi.fn();
+    vi.stubGlobal("window", {
+      location: { pathname: "/orders", replace },
+      dispatchEvent,
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          text: () =>
+            Promise.resolve(
+              JSON.stringify({ detail: "Could not validate credentials" }),
+            ),
+        } as Response),
+      ),
+    );
+
+    await expect(apiFetch("/api/v1/orders")).rejects.toThrow(
+      "Could not validate credentials",
+    );
+    expect(removeItem).toHaveBeenCalledWith("token");
+    expect(removeItem).toHaveBeenCalledWith("user");
+    expect(replace).toHaveBeenCalledWith("/login");
+    expect(dispatchEvent).toHaveBeenCalled();
+  });
 });
