@@ -43,10 +43,12 @@ export function Navbar() {
     void syncAuthState();
     window.addEventListener("focus", handleAuthRefresh);
     window.addEventListener("storage", handleAuthRefresh);
+    window.addEventListener("auth:logout", handleAuthRefresh);
 
     return () => {
       window.removeEventListener("focus", handleAuthRefresh);
       window.removeEventListener("storage", handleAuthRefresh);
+      window.removeEventListener("auth:logout", handleAuthRefresh);
     };
   }, [pathname]);
 
