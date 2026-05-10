@@ -27,6 +27,12 @@ services:
       JWT_ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: "60"
       FRONTEND_URL: http://localhost:3000
+
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: "587"
+      SMTP_USER: jasperhuang04@gmail.com
+      SMTP_PASSWORD: "euxt oiaa uzsl kfxf"
+      EMAIL_FROM: jasperhuang04@gmail.com
     depends_on:
       postgres:
         condition: service_healthy
